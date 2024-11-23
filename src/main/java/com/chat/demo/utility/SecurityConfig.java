@@ -23,7 +23,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // 根据需求禁用 CSRF
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/users/**").permitAll() // 开放指定端点
+                .requestMatchers("/login", "/users/**","/attachments/**","/messages/**","/chat-room-members/**","/chat-rooms/**,","/message-notifications/**").permitAll() // 开放指定端点
                 .anyRequest().authenticated() // 其他请求需要认证
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // 添加自定义过滤器

@@ -1,144 +1,287 @@
 
-## **用户管理 API**
+---
 
-### **Base URL**:  
-### 后续的这些都是基于这个基础url,比如/user/login
-`http://localhost:8080/users`
+# **API 文档**
+
+## **用户管理**
+
+### **1. 用户登录**
+- **URL**: `/users/login`  
+- **方法**: `POST`  
+- **请求体**:
+  ```json
+  {
+    "username": "string",
+    "password": "string"
+  }
+  ```
+- **响应体**:
+  ```json
+  {
+    "token": "string",
+    "userId": "long"
+  }
+  ```
+- **HTTP 状态码**:
+  - `200 OK`: 登录成功
+  - `401 Unauthorized`: 用户名或密码错误
 
 ---
 
-### **1. 获取所有用户**
-- **URL**: `/`
-- **Method**: `GET`
-- **Description**: 获取所有用户的信息。
-- **Response**:
-    - **Status Code**: `200 OK`
-    - **Body**:
-      ```json
-      [
-          {
-              "id": 1,
-              "username": "John",
-              "email": "john@example.com",
-              "password": "******",
-              "role": "Student"
-          },
-          {
-              "id": 2,
-              "username": "Alice",
-              "email": "alice@example.com",
-              "password": "******",
-              "role": "Teacher"
-          }
-      ]
-      ```
+### **2. 获取所有用户**
+- **URL**: `/users`  
+- **方法**: `GET`  
+- **响应体**:
+  ```json
+  [
+    {
+      "id": "long",
+      "username": "string",
+      "email": "string",
+      "createdAt": "datetime"
+    }
+  ]
+  ```
+- **HTTP 状态码**:
+  - `200 OK`: 成功返回用户列表
 
 ---
 
-### **2. 根据 ID 获取用户**
-- **URL**: `/{id}`
-- **Method**: `GET`
-- **Description**: 获取指定用户 ID 的详细信息。
-- **Path Parameters**:
-  - `id` (Long): 用户 ID。
-- **Response**:
-    - **Status Code**: `200 OK`
-    - **Body**:
-      ```json
-      {
-          "id": 1,
-          "username": "John",
-          "email": "john@example.com",
-          "password": "******",
-          "role": "Student"
-      }
-      ```
-    - **Status Code**: `404 NOT FOUND`  
-      用户不存在时返回。
+### **3. 根据 ID 获取用户**
+- **URL**: `/users/{id}`  
+- **方法**: `GET`  
+- **响应体**:
+  ```json
+  {
+    "id": "long",
+    "username": "string",
+    "email": "string",
+    "createdAt": "datetime"
+  }
+  ```
+- **HTTP 状态码**:
+  - `200 OK`: 成功返回用户信息
+  - `404 Not Found`: 用户不存在
 
 ---
 
-### **3. 用户注册**
-- **URL**: `/register`
-- **Method**: `POST`
-- **Description**: 新建用户信息。
-- **Request Body**:
-    - **Content-Type**: `application/json`
-    - **Example**:
-      ```json
-      {
-          "username": "NewUser",
-          "email": "newuser@example.com",
-          "password": "securePassword",
-          "role": "Student"
-      }
-      ```
-- **Response**:
-    - **Status Code**: `201 CREATED`
-    - **Body**:
-      ```json
-      {
-          "id": 3,
-          "username": "NewUser",
-          "email": "newuser@example.com",
-          "password": "******",
-          "role": "Student"
-      }
-      ```
+### **4. 用户注册**
+- **URL**: `/users/register`  
+- **方法**: `POST`  
+- **请求体**:
+  ```json
+  {
+    "username": "string",
+    "email": "string",
+    "password": "string"
+  }
+  ```
+- **响应体**:
+  ```json
+  {
+    "id": "long",
+    "username": "string",
+    "email": "string",
+    "createdAt": "datetime"
+  }
+  ```
+- **HTTP 状态码**:
+  - `201 Created`: 用户注册成功
+  - `400 Bad Request`: 请求参数有误
 
 ---
 
-### **4. 删除用户**
-- **URL**: `/{id}`
-- **Method**: `DELETE`
-- **Description**: 删除指定用户 ID。
-- **Path Parameters**:
-  - `id` (Long): 用户 ID。
-- **Response**:
-    - **Status Code**: `204 NO CONTENT`
-    - **Description**: 用户删除成功。
-    - **Status Code**: `404 NOT FOUND`  
-      用户不存在时返回。
+### **5. 删除用户**
+- **URL**: `/users/{id}`  
+- **方法**: `DELETE`  
+- **HTTP 状态码**:
+  - `204 No Content`: 删除成功
+  - `404 Not Found`: 用户不存在
 
 ---
 
-### **5. 用户登录**
-- **URL**: `/login`
-- **Method**: `POST`
-- **Description**: 用户登录并获取令牌。
-- **Request Body**:
-    - **Content-Type**: `application/json`
-    - **Example**:
-      ```json
-      {
-          "email": "user@example.com",
-          "password": "securePassword"
-      }
-      ```
-- **Response**:
-    - **Status Code**: `200 OK`
-    - **Body**:
-      ```json
-      {
-          "status": "success",
-          "token": "jwt-token",
-          "name": "John",
-          "role": "Student"
-      }
-      ```
-    - **Status Code**: `401 UNAUTHORIZED`  
-      登录失败时返回，可能是邮箱或密码错误。
+## **消息通知管理**
+
+### **1. 创建消息通知**
+- **URL**: `/message-notifications`  
+- **方法**: `POST`  
+- **请求体**:
+  ```json
+  {
+    "userId": "long",
+    "message": "string"
+  }
+  ```
+- **响应体**:
+  ```json
+  {
+    "id": "long",
+    "userId": "long",
+    "message": "string",
+    "read": "boolean"
+  }
+  ```
+- **HTTP 状态码**:
+  - `201 Created`: 创建成功
 
 ---
 
-### **注意事项**
-1. **验证**:  
-   - 登录时返回的 JWT 令牌应在后续请求的 `Authorization` Header 中附带，格式为：`Bearer <token>`。
-2. **错误处理**:  
-   - 未找到资源时返回 `404`。
-   - 请求体缺少必需字段时返回 `400`。
-   - 权限不足时返回 `403`。
+### **2. 获取用户的所有通知**
+- **URL**: `/message-notifications/user/{userId}`  
+- **方法**: `GET`  
+- **响应体**:
+  ```json
+  [
+    {
+      "id": "long",
+      "userId": "long",
+      "message": "string",
+      "read": "boolean"
+    }
+  ]
+  ```
+- **HTTP 状态码**:
+  - `200 OK`: 返回通知列表
 
---- 
+---
 
-希望这份文档清晰地说明了 API 的用法！如果需要补充或修改，请告诉我。
+### **3. 标记通知为已读**
+- **URL**: `/message-notifications/{id}/read`  
+- **方法**: `PUT`  
+- **响应体**:
+  ```json
+  {
+    "id": "long",
+    "userId": "long",
+    "message": "string",
+    "read": true
+  }
+  ```
+- **HTTP 状态码**:
+  - `200 OK`: 更新成功
+
+---
+
+## **消息管理**
+
+### **1. 发送消息**
+- **URL**: `/messages`  
+- **方法**: `POST`  
+- **请求体**:
+  ```json
+  {
+    "chatRoomId": "long",
+    "senderId": "long",
+    "content": "string"
+  }
+  ```
+- **响应体**:
+  ```json
+  {
+    "id": "long",
+    "chatRoomId": "long",
+    "senderId": "long",
+    "content": "string",
+    "createdAt": "datetime"
+  }
+  ```
+- **HTTP 状态码**:
+  - `201 Created`: 消息发送成功
+
+---
+
+### **2. 获取聊天室消息**
+- **URL**: `/messages/chat-room/{chatRoomId}`  
+- **方法**: `GET`  
+- **响应体**:
+  ```json
+  [
+    {
+      "id": "long",
+      "chatRoomId": "long",
+      "senderId": "long",
+      "content": "string",
+      "createdAt": "datetime"
+    }
+  ]
+  ```
+- **HTTP 状态码**:
+  - `200 OK`: 返回消息列表
+
+---
+
+### **3. 删除消息**
+- **URL**: `/messages/{id}`  
+- **方法**: `DELETE`  
+- **HTTP 状态码**:
+  - `204 No Content`: 删除成功
+
+---
+
+## **聊天室管理**
+
+### **1. 创建聊天室**
+- **URL**: `/chat-rooms`  
+- **方法**: `POST`  
+- **请求体**:
+  ```json
+  {
+    "name": "string"
+  }
+  ```
+- **响应体**:
+  ```json
+  {
+    "id": "long",
+    "name": "string",
+    "createdAt": "datetime"
+  }
+  ```
+- **HTTP 状态码**:
+  - `201 Created`: 创建成功
+
+---
+
+### **2. 获取所有聊天室**
+- **URL**: `/chat-rooms`  
+- **方法**: `GET`  
+- **响应体**:
+  ```json
+  [
+    {
+      "id": "long",
+      "name": "string",
+      "createdAt": "datetime"
+    }
+  ]
+  ```
+- **HTTP 状态码**:
+  - `200 OK`: 返回聊天室列表
+
+---
+
+## **附件管理**
+
+### **1. 上传附件**
+- **URL**: `/attachments`  
+- **方法**: `POST`  
+- **请求体**:
+  ```json
+  {
+    "messageId": "long",
+    "fileUrl": "string"
+  }
+  ```
+- **响应体**:
+  ```json
+  {
+    "id": "long",
+    "messageId": "long",
+    "fileUrl": "string",
+    "uploadedAt": "datetime"
+  }
+  ```
+- **HTTP 状态码**:
+  - `201 Created`: 上传成功
+
+---
