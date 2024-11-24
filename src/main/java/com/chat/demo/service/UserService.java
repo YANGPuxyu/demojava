@@ -1,93 +1,89 @@
 package com.chat.demo.service;
 
-import com.chat.demo.entity.DTO.LoginRequestDto;
-import com.chat.demo.entity.DTO.LoginResponseDto;
 import com.chat.demo.entity.DTO.UserDto;
 import com.chat.demo.entity.User;
 import com.chat.demo.repository.UserRepository;
-import com.chat.demo.utility.JwtUtil;
-import org.springframework.beans.BeanUtils;
+import com.chat.demo.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
-import java.time.LocalDateTime;
+
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
 
-    // 获取所有用户并转换为 UserDto
+    // 登录接口
+    public Response<UserDto> login(UserDto userDto) {
+        Optional<User> userOptional = userRepository.findByEmail(userDto.getEmail());
+        if (userOptional.isEmpty() || !userOptional.get().getPassword().equals(userDto.getPassword())) {
+            return Response.error("邮箱或密码错误");
+        }
+        return Response.success(mapToDto(userOptional.get()));
+    }
+
+    // 获取所有用户
     public List<UserDto> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        return userRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
-    // 根据 ID 获取用户并转换为 UserDto
-    public UserDto getUserById(Long id) {
-        User user = userRepository.findById(id).orElse(null);
-        return (user != null) ? convertToDto(user) : null;
+    // 根据 ID 获取用户
+    public Response<UserDto> getUserById(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            return Response.error("用户不存在");
+        }
+        return Response.success(mapToDto(userOptional.get()));
     }
 
-    // 创建用户，将 UserDto 转换为 User
-    // 创建用户，将 UserDto 转换为 User
-    public UserDto createUser(User userDto) {
-        User user = convertToEntity(userDto);
+    // 注册新用户
+    @Transactional
+    public Response<UserDto> createUser(UserDto userDto) {
+        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
+            return Response.error("邮箱已注册");
+        }
 
-        // 设置创建时间和更新时间为当前时间
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
-
-        // 加密密码
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        User user = mapToEntity(userDto);
+        user.setRole("用户"); // 默认角色
         User savedUser = userRepository.save(user);
-        return convertToDto(savedUser);
+        return Response.success(mapToDto(savedUser));
     }
-
 
     // 删除用户
-    public void deleteUser(Long id) {
+    @Transactional
+    public Response<String> deleteUser(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            return Response.error("用户不存在");
+        }
         userRepository.deleteById(id);
+        return Response.success("用户删除成功");
     }
 
-    // 将 User 实体转换为 UserDto
-    private UserDto convertToDto(User user) {
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(user, userDto);
-        return userDto;
-    }
-
-    // 将 UserDto 转换为 User 实体
-    private User convertToEntity(User userDto) {
+    // DTO 转 Entity
+    private User mapToEntity(UserDto userDto) {
         User user = new User();
-        BeanUtils.copyProperties(userDto, user);
+        user.setId(userDto.getId());
+        user.setUsername(userDto.getUsername());
+        user.setPassword(userDto.getPassword());
+        user.setEmail(userDto.getEmail());
+        user.setRole(userDto.getRole());
         return user;
     }
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    // 登录逻辑
-    public LoginResponseDto login(LoginRequestDto loginRequest) {
-        Optional<User> userOptional = userRepository.findByEmail(loginRequest.getEmail());
-        if (userOptional.isEmpty()) {
-            return new LoginResponseDto("Invalid email", null, null, null);
-        }
-
-        User existingUser = userOptional.get();
-        if (!passwordEncoder.matches(loginRequest.getPassword(), existingUser.getPassword())) {
-            return new LoginResponseDto("Invalid password", null, null, null);
-        }
-        JwtUtil jwtUtil = new JwtUtil();
-        // 使用 JwtUtil 生成 JWT Token
-        String token = jwtUtil.generateToken(existingUser.getEmail(), existingUser.getRole());
-
-        // 返回用户名、角色和 JWT Token
-        return new LoginResponseDto("Login successful", token, existingUser.getName(), existingUser.getRole());
+    // Entity 转 DTO
+    private UserDto mapToDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setUsername(user.getUsername());
+        userDto.setPassword(user.getPassword());
+        userDto.setEmail(user.getEmail());
+        userDto.setRole(user.getRole());
+        return userDto;
     }
-
 }

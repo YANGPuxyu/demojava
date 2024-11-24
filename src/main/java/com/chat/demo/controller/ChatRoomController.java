@@ -1,15 +1,13 @@
 package com.chat.demo.controller;
-import com.chat.demo.entity.ChatRoom;
+
 import com.chat.demo.entity.DTO.ChatRoomDto;
-import com.chat.demo.entity.DTO.LoginRequestDto;
-import com.chat.demo.entity.DTO.LoginResponseDto;
-import com.chat.demo.entity.DTO.UserDto;
-import com.chat.demo.entity.User;
+import com.chat.demo.response.Response;
 import com.chat.demo.service.ChatRoomService;
-import com.chat.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+
 @RestController
 @RequestMapping("/chat-rooms")
 public class ChatRoomController {
@@ -18,28 +16,44 @@ public class ChatRoomController {
     private ChatRoomService chatRoomService;
 
     @PostMapping
-    public ChatRoomDto createChatRoom(@RequestBody ChatRoomDto chatRoom) {
-        return chatRoomService.createChatRoom(chatRoom);
+    public Response<ChatRoomDto> createChatRoom(@RequestBody ChatRoomDto chatRoom) {
+        ChatRoomDto createdChatRoom = chatRoomService.createChatRoom(chatRoom);
+        if (createdChatRoom == null) {
+            return Response.error("Failed to create chat room");
+        }
+        return Response.success(createdChatRoom);
     }
 
     @GetMapping
-    public List<ChatRoomDto> getAllChatRooms() {
-        return chatRoomService.getAllChatRooms();
+    public Response<List<ChatRoomDto>> getAllChatRooms() {
+        List<ChatRoomDto> chatRooms = chatRoomService.getAllChatRooms();
+        return Response.success(chatRooms);
     }
 
     @GetMapping("/{id}")
-    public ChatRoomDto getChatRoomById(@PathVariable Long id) {
-        return chatRoomService.getChatRoomById(id);
+    public Response<ChatRoomDto> getChatRoomById(@PathVariable Long id) {
+        ChatRoomDto chatRoom = chatRoomService.getChatRoomById(id);
+        if (chatRoom == null) {
+            return Response.error("Chat room not found");
+        }
+        return Response.success(chatRoom);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteChatRoom(@PathVariable Long id) {
-        chatRoomService.deleteChatRoom(id);
+    public Response<Void> deleteChatRoom(@PathVariable Long id) {
+        boolean deleted = chatRoomService.deleteChatRoom(id);
+        if (!deleted) {
+            return Response.error("Chat room not found or could not be deleted");
+        }
+        return Response.success(null);
     }
 
     @PutMapping("/{id}")
-    public ChatRoomDto updateChatRoom(@PathVariable Long id, @RequestBody ChatRoomDto chatRoom) {
-        return chatRoomService.updateChatRoom(id, chatRoom);
+    public Response<ChatRoomDto> updateChatRoom(@PathVariable Long id, @RequestBody ChatRoomDto chatRoom) {
+        ChatRoomDto updatedChatRoom = chatRoomService.updateChatRoom(id, chatRoom);
+        if (updatedChatRoom == null) {
+            return Response.error("Failed to update chat room");
+        }
+        return Response.success(updatedChatRoom);
     }
 }
-

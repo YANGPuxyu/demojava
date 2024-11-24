@@ -1,20 +1,11 @@
 package com.chat.demo.service;
 import com.chat.demo.entity.ChatRoomMember;
 import com.chat.demo.entity.DTO.ChatRoomMemberDto;
-import com.chat.demo.entity.DTO.LoginRequestDto;
-import com.chat.demo.entity.DTO.LoginResponseDto;
-import com.chat.demo.entity.DTO.UserDto;
-import com.chat.demo.entity.User;
 import com.chat.demo.repository.ChatRoomMemberRepository;
-import com.chat.demo.repository.UserRepository;
-import com.chat.demo.utility.JwtUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 @Service

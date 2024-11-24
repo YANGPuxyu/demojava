@@ -1,22 +1,16 @@
 package com.chat.demo.service;
+
 import com.chat.demo.entity.Attachment;
 import com.chat.demo.entity.DTO.AttachmentDto;
-import com.chat.demo.entity.DTO.LoginRequestDto;
-import com.chat.demo.entity.DTO.LoginResponseDto;
-import com.chat.demo.entity.DTO.UserDto;
-import com.chat.demo.entity.User;
 import com.chat.demo.repository.AttachmentRepository;
-import com.chat.demo.repository.UserRepository;
-import com.chat.demo.utility.JwtUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
+
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class AttachmentService {
 
@@ -34,17 +28,18 @@ public class AttachmentService {
     // 上传附件
     public AttachmentDto uploadAttachment(AttachmentDto attachmentDto) {
         Attachment attachment = convertToEntity(attachmentDto);
-
-        // 设置上传时间为当前时间
         attachment.setUploadedAt(LocalDateTime.now());
-
         Attachment savedAttachment = attachmentRepository.save(attachment);
         return convertToDto(savedAttachment);
     }
 
     // 删除附件
-    public void deleteAttachment(Long id) {
-        attachmentRepository.deleteById(id);
+    public boolean deleteAttachment(Long id) {
+        if (attachmentRepository.existsById(id)) {
+            attachmentRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     // 将实体转换为 DTO

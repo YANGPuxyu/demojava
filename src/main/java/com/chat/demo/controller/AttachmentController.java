@@ -1,15 +1,11 @@
 package com.chat.demo.controller;
 
-import com.chat.demo.entity.Attachment;
 import com.chat.demo.entity.DTO.AttachmentDto;
-import com.chat.demo.entity.DTO.LoginRequestDto;
-import com.chat.demo.entity.DTO.LoginResponseDto;
-import com.chat.demo.entity.DTO.UserDto;
-import com.chat.demo.entity.User;
+import com.chat.demo.response.Response;
 import com.chat.demo.service.AttachmentService;
-import com.chat.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -20,17 +16,29 @@ public class AttachmentController {
     private AttachmentService attachmentService;
 
     @PostMapping
-    public AttachmentDto uploadAttachment(@RequestBody AttachmentDto attachment) {
-        return attachmentService.uploadAttachment(attachment);
+    public Response<AttachmentDto> uploadAttachment(@RequestBody AttachmentDto attachment) {
+        AttachmentDto result = attachmentService.uploadAttachment(attachment);
+        if (result.getId() == null) {
+            return Response.error("Failed to upload attachment");
+        }
+        return Response.success(result);
     }
 
     @GetMapping("/message/{messageId}")
-    public List<AttachmentDto> getAttachmentsByMessage(@PathVariable Long messageId) {
-        return attachmentService.getAttachmentsByMessage(messageId);
+    public Response<List<AttachmentDto>> getAttachmentsByMessage(@PathVariable Long messageId) {
+        List<AttachmentDto> attachments = attachmentService.getAttachmentsByMessage(messageId);
+        if (attachments.isEmpty()) {
+            return Response.error("No attachments found for the message");
+        }
+        return Response.success(attachments);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAttachment(@PathVariable Long id) {
-        attachmentService.deleteAttachment(id);
+    public Response<Void> deleteAttachment(@PathVariable Long id) {
+        boolean success = attachmentService.deleteAttachment(id);
+        if (success) {
+            return Response.success(null);
+        }
+        return Response.error("Failed to delete attachment with id: " + id);
     }
 }

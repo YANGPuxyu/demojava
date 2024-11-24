@@ -15,9 +15,9 @@ public class GlobalExceptionHandler {
         return Response.error("Internal server error: " + e.getMessage());
     }
 
-    @ExceptionHandler(UserNotFoundException.class) // 自定义异常
-    @ResponseBody
-    public Response<String> handleUserNotFoundException(UserNotFoundException e) {
-        return Response.error("User not found: " + e.getMessage());
-    }
+//    @ExceptionHandler(UserNotFoundException.class) // 自定义异常
+//    @ResponseBody
+//    public Response<String> handleUserNotFoundException(UserNotFoundException e) {
+//        return Response.error("User not found: " + e.getMessage());
+//    }
 }

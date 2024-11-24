@@ -21,6 +21,18 @@ public class UserDto {
     @NotBlank(message = "Role cannot be empty")
     private String role; // 角色（学生、教师、管理员）
 
+    // 无参构造函数（默认需要）
+    public UserDto() {
+    }
+
+    // 全参构造函数
+    public UserDto(Long id, String username, String email, String role, String password) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.role = role;
+        this.password = password;
+    }
     // Getters and setters
        // Getters and setters
     public Long getId() {

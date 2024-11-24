@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,47 +28,37 @@ public class MessageNotificationService {
 
     // 标记通知为已读
     public MessageNotificationDto markNotificationAsRead(Long notificationId) {
-        MessageNotification notification = notificationRepository.findById(notificationId).orElse(null);
-        if (notification != null) {
+        Optional<MessageNotification> notificationOpt = notificationRepository.findById(notificationId);
+        if (notificationOpt.isPresent()) {
+            MessageNotification notification = notificationOpt.get();
             notification.setIsRead(true);
             notificationRepository.save(notification);
+            return convertToDto(notification);
         }
-        return null;
+        return null; // 通知不存在时返回 null
     }
 
-public MessageNotificationDto createNotification(MessageNotificationDto notificationDto) {
-    // 转换为实体对象
-    MessageNotification notification = convertToEntity(notificationDto);
+    // 创建通知
+    public MessageNotificationDto createNotification(MessageNotificationDto notificationDto) {
+        MessageNotification notification = convertToEntity(notificationDto);
+        notification.setIsRead(false);
+        notification.setNotifiedAt(LocalDateTime.now());
 
-    // 设置默认值
-    notification.setIsRead(false);
-    notification.setNotifiedAt(LocalDateTime.now());
-
-    // 保存到数据库
-    MessageNotification savedNotification = notificationRepository.save(notification);
-
-    // 转换为 DTO 并返回
-    return convertToDto(savedNotification);
-}
-
-// 将 DTO 转换为 Entity
-private MessageNotification convertToEntity(MessageNotificationDto dto) {
-    MessageNotification notification = new MessageNotification();
-    BeanUtils.copyProperties(dto, notification);
-
-    // 如果 DTO 中的时间是字符串形式，需转换为 LocalDateTime
-    if (dto.getNotifiedAt() != null) {
-        notification.setNotifiedAt(dto.getNotifiedAt());
+        MessageNotification savedNotification = notificationRepository.save(notification);
+        return convertToDto(savedNotification);
     }
-    return notification;
-}
 
+    // DTO 转换为 Entity
+    private MessageNotification convertToEntity(MessageNotificationDto dto) {
+        MessageNotification notification = new MessageNotification();
+        BeanUtils.copyProperties(dto, notification);
+        return notification;
+    }
 
-    // 将 Entity 转换为 DTO
+    // Entity 转换为 DTO
     private MessageNotificationDto convertToDto(MessageNotification notification) {
         MessageNotificationDto dto = new MessageNotificationDto();
         BeanUtils.copyProperties(notification, dto);
         return dto;
     }
-
 }

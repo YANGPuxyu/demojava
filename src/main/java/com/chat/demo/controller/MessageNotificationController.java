@@ -1,15 +1,13 @@
 package com.chat.demo.controller;
-import com.chat.demo.entity.DTO.LoginRequestDto;
-import com.chat.demo.entity.DTO.LoginResponseDto;
+
 import com.chat.demo.entity.DTO.MessageNotificationDto;
-import com.chat.demo.entity.DTO.UserDto;
-import com.chat.demo.entity.MessageNotification;
-import com.chat.demo.entity.User;
+import com.chat.demo.response.Response;
 import com.chat.demo.service.MessageNotificationService;
-import com.chat.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+
 @RestController
 @RequestMapping("/message-notifications")
 public class MessageNotificationController {
@@ -18,17 +16,21 @@ public class MessageNotificationController {
     private MessageNotificationService messageNotificationService;
 
     @PostMapping
-    public MessageNotificationDto createNotification(@RequestBody MessageNotificationDto notification) {
-        return messageNotificationService.createNotification(notification);
+    public Response<MessageNotificationDto> createNotification(@RequestBody MessageNotificationDto notification) {
+        return Response.success(messageNotificationService.createNotification(notification));
     }
 
     @GetMapping("/user/{userId}")
-    public List<MessageNotificationDto> getNotificationsByUser(@PathVariable Long userId) {
-        return messageNotificationService.getNotificationsByUserId(userId);
+    public Response<List<MessageNotificationDto>> getNotificationsByUser(@PathVariable Long userId) {
+        return Response.success(messageNotificationService.getNotificationsByUserId(userId));
     }
 
     @PutMapping("/{id}/read")
-    public MessageNotificationDto markNotificationAsRead(@PathVariable Long id) {
-        return messageNotificationService.markNotificationAsRead(id);
+    public Response<MessageNotificationDto> markNotificationAsRead(@PathVariable Long id) {
+        MessageNotificationDto updatedNotification = messageNotificationService.markNotificationAsRead(id);
+        if (updatedNotification != null) {
+            return Response.success(updatedNotification);
+        }
+        return Response.error("通知不存在或操作失败");
     }
 }

@@ -1,15 +1,13 @@
 package com.chat.demo.controller;
-import com.chat.demo.entity.ChatRoomMember;
+
 import com.chat.demo.entity.DTO.ChatRoomMemberDto;
-import com.chat.demo.entity.DTO.LoginRequestDto;
-import com.chat.demo.entity.DTO.LoginResponseDto;
-import com.chat.demo.entity.DTO.UserDto;
-import com.chat.demo.entity.User;
+import com.chat.demo.response.Response;
 import com.chat.demo.service.ChatRoomMemberService;
-import com.chat.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+
 @RestController
 @RequestMapping("/chat-room-members")
 public class ChatRoomMemberController {
@@ -18,17 +16,20 @@ public class ChatRoomMemberController {
     private ChatRoomMemberService chatRoomMemberService;
 
     @PostMapping
-    public ChatRoomMemberDto addMemberToChatRoom(@RequestBody ChatRoomMemberDto chatRoomMember) {
-        return chatRoomMemberService.addMemberToChatRoom(chatRoomMember);
+    public Response<ChatRoomMemberDto> addMemberToChatRoom(@RequestBody ChatRoomMemberDto chatRoomMember) {
+        ChatRoomMemberDto savedMember = chatRoomMemberService.addMemberToChatRoom(chatRoomMember);
+        return Response.success(savedMember);
     }
 
     @GetMapping("/chat-room/{chatRoomId}")
-    public List<ChatRoomMemberDto> getMembersByChatRoom(@PathVariable Long chatRoomId) {
-        return chatRoomMemberService.getMembersByChatRoom(chatRoomId);
+    public Response<List<ChatRoomMemberDto>> getMembersByChatRoom(@PathVariable Long chatRoomId) {
+        List<ChatRoomMemberDto> members = chatRoomMemberService.getMembersByChatRoom(chatRoomId);
+        return Response.success(members);
     }
 
     @DeleteMapping("/{id}")
-    public void removeMemberFromChatRoom(@PathVariable Long id) {
+    public Response<Void> removeMemberFromChatRoom(@PathVariable Long id) {
         chatRoomMemberService.removeMemberFromChatRoom(id);
+        return Response.success(null);
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,14 +38,20 @@ public class MessageService {
     }
 
     // 删除消息
-    public void deleteMessage(Long id) {
-        messageRepository.deleteById(id);
+    public boolean deleteMessage(Long id) {
+        Optional<Message> message = messageRepository.findById(id);
+        if (message.isPresent()) {
+            messageRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     // 将实体转换为 DTO
     private MessageDto convertToDto(Message message) {
         MessageDto messageDto = new MessageDto();
         BeanUtils.copyProperties(message, messageDto);
+        messageDto.setCreatedAt(message.getCreatedAt().toString());
         return messageDto;
     }
 
@@ -55,4 +62,3 @@ public class MessageService {
         return message;
     }
 }
-
