@@ -4,11 +4,14 @@ import com.chat.demo.entity.DTO.UserDto;
 import com.chat.demo.entity.User;
 import com.chat.demo.repository.UserRepository;
 import com.chat.demo.response.Response;
+import com.chat.demo.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -18,14 +21,28 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // 登录接口
-    public Response<UserDto> login(UserDto userDto) {
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    public Response<Map<String, Object>> login(UserDto userDto) {
         Optional<User> userOptional = userRepository.findByEmail(userDto.getEmail());
+
         if (userOptional.isEmpty() || !userOptional.get().getPassword().equals(userDto.getPassword())) {
             return Response.error("邮箱或密码错误");
         }
-        return Response.success(mapToDto(userOptional.get()));
+
+        // 用户验证通过，生成 Token
+        User user = userOptional.get();
+        String token = jwtUtil.generateToken(user.getName(), user.getRole());
+
+        // 构建返回数据
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("user", mapToDto(user));
+        responseData.put("token", token);
+
+        return Response.success(responseData);
     }
+
 
     // 获取所有用户
     public List<UserDto> getAllUsers() {

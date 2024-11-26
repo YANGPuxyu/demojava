@@ -16,17 +16,22 @@
 ```  
 **响应**:
 - 成功:  
-  ```json
-  {
-    "code": 200,
-    "message": "Success",
-    "data": {
-      "id": 1,
-      "username": "User",
-      "email": "user@example.com",
-      "role": "学生"
-    }
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": {
+      "user": {
+          "id": 3,
+          "username": "香草冰激凌",
+          "email": "2229393511@qq.com",
+          "password": "2a10$L2ItSfAshIqmnD6b88AQF.I8WfZN8LGdNFKgoCA6ssY124UjbcVw.",
+          "role": "宝宝 "
+      },
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiLpppnojYnlhrDmv4Dlh4wiLCJyb2xlIjoi5a6d5a6dICIsImlhdCI6MTczMjYyODMzMywiZXhwIjoxNzMyNjMxOTMzfQ.A5eKpTPQREYSMdM5nb8EOCtTJiLZ4blvwK-67Ar5w48"
   }
+}
+```
   ```
 - 失败:  
   ```json

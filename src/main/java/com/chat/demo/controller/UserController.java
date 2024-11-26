@@ -6,6 +6,7 @@ import com.chat.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -16,7 +17,7 @@ public class UserController {
 
     // 登录接口，返回用户信息
     @PostMapping("/login")
-    public Response<UserDto> login(@RequestBody UserDto userDto) {
+    public Response<Map<String, Object>> login(@RequestBody UserDto userDto) {
         return userService.login(userDto);
     }
 
