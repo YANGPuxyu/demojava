@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -18,7 +19,7 @@ public class UserController {
 
     // 登录接口，返回用户信息
     @PostMapping("/login")
-    public Response<UserDto> login(@RequestBody UserDto userDto) {
+    public Response<Map<String, Object>> login(@RequestBody UserDto userDto) {
         return userService.login(userDto);
     }
 
