@@ -1,10 +1,16 @@
 package com.chat.demo.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
+import java.util.List;
 
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "users") // 指定数据库表名为 users
@@ -24,7 +30,7 @@ public class User {
     private String password; // 密码（加密存储）
 
     @Column(nullable = false)
-    private String role; // 角色（学生、教师、管理员）
+    private String role; // 角色（学生、���师、管理员）
 
     @CreatedDate
     @Column(name = "created_at")
@@ -33,6 +39,10 @@ public class User {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt; // 更新时间
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<Friendship> friends; // 好友关系
 
     // Getters and setters
     public Long getId() {
@@ -91,7 +101,11 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    public String getName() {
-        return username;
+    public Set<Friendship> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(Set<Friendship> friends) {
+        this.friends = friends;
     }
 }
