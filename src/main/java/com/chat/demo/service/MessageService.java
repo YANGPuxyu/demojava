@@ -5,6 +5,7 @@ import com.chat.demo.entity.Message;
 import com.chat.demo.repository.MessageRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,8 @@ public class MessageService {
     @Autowired
     private MessageRepository messageRepository;
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate; // 注入 WebSocket 消息推送工具
     // 获取聊天室的所有消息
     public List<MessageDto> getMessagesByChatRoom(Long chatRoomId) {
         return messageRepository.findByChatRoomId(chatRoomId)
@@ -28,13 +31,23 @@ public class MessageService {
 
     // 发送消息
     public MessageDto sendMessage(MessageDto messageDto) {
+        // 将消息 DTO 转换为实体类
         Message message = convertToEntity(messageDto);
 
-        // 设置消息发送时间为当前时间
+        // 设置消息的发送时间
         message.setCreatedAt(LocalDateTime.now());
 
+        // 保存消息到数据库
         Message savedMessage = messageRepository.save(message);
-        return convertToDto(savedMessage);
+
+        // 将消息转换回 DTO
+        MessageDto result = convertToDto(savedMessage);
+
+        // 推送消息到 WebSocket 客户端
+        String destination = "/topic/chat-room/" + message.getChatRoomId();  // 聊天室对应的 WebSocket 主题
+        messagingTemplate.convertAndSend(destination, result);  // 发送消息到指定聊天室
+
+        return result;
     }
 
     // 删除消息

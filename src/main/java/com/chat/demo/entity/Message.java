@@ -35,6 +35,7 @@ public class Message {
     }
 
     public void setId(Long id) {
+
         this.id = id;
     }
 

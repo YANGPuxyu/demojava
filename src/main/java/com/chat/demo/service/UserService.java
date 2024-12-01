@@ -33,7 +33,7 @@ public class UserService {
 
         // 用户验证通过，生成 Token
         User user = userOptional.get();
-        String token = jwtUtil.generateToken(user.getName(), user.getRole());
+        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
 
         // 构建返回数据
         Map<String, Object> responseData = new HashMap<>();
