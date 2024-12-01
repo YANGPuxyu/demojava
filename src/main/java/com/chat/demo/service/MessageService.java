@@ -43,9 +43,7 @@ public class MessageService {
         // 将消息转换回 DTO
         MessageDto result = convertToDto(savedMessage);
 
-        // 推送消息到 WebSocket 客户端
-        String destination = "/topic/chat-room/" + message.getChatRoomId();  // 聊天室对应的 WebSocket 主题
-        messagingTemplate.convertAndSend(destination, result);  // 发送消息到指定聊天室
+
 
         return result;
     }

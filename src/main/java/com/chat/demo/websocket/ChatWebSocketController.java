@@ -19,7 +19,10 @@ public class ChatWebSocketController {
     // 接收 WebSocket 消息并保存，然后推送给其他客户端
     @MessageMapping("/sendMessage")  // 监听 "/app/sendMessage" 的消息
     public void handleMessage(MessageDto messageDto) {
-        // 保存消息到数据库,在内部会执行发送订阅
+        // 保存消息到数据库
         MessageDto savedMessage = messageService.sendMessage(messageDto);
+
+        // 将保存的消息推送到所有订阅了该聊天室的客户端
+        messagingTemplate.convertAndSend("/topic/chat-room/" + savedMessage.getChatRoomId(), savedMessage);
     }
 }
