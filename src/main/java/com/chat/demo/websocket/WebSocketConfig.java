@@ -22,8 +22,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws/chat").withSockJS();  // WebSocket 端点
+        registry.addEndpoint("/ws/chat")
+                .setAllowedOrigins("http://127.0.0.1:8080","http://127.0.0.1:5500")  // 允许特定的源进行连接
+                .withSockJS();
     }
+
 
     @Bean
     public ServerEndpointExporter serverEndpointExporter() {

@@ -1,4 +1,3 @@
-以下是 `MessageController` 的 API 文档
 
 ---
 
@@ -40,36 +39,6 @@
         "data": null
     }
     ```
-#### **3. WebSocket 发送消息**
-- **URL**: `/app/sendMessage`
-- **方法**: `SEND`（WebSocket）
-- **描述**:  
-  客户端通过 WebSocket 向服务器发送消息，消息将被保存到数据库，并通过 WebSocket 推送到聊天室中的所有订阅者。
-
-- **请求体**：
-  发送的消息结构与 `POST /messages` API 的请求体相同。以下是 WebSocket 请求体的示例：
-
-  ```json
-  {
-    "chatRoomId": 1,
-    "userId": 10,
-    "content": "Hello, World!",
-    "messageType": "text"
-  }
-  ```
-- **响应**：
-  服务器会将消息推送到订阅了该聊天室的所有客户端。客户端接收到的消息与请求消息相同，附带 `createdAt`（消息发送时间）字段。
-
-  ```json
-  {
-    "chatRoomId": 1,
-    "userId": 10,
-    "content": "Hello, World!",
-    "messageType": "text",
-    "createdAt": "2024-12-01T14:35:23"
-  }
-  ```
----
 
 #### **2. 获取聊天室的所有消息**
 - **URL**: `/messages/chat-room/{chatRoomId}`
@@ -123,9 +92,6 @@
 
 ---
 
-
----
-
 ### **WebSocket API 文档**
 
 #### **1. WebSocket 连接**
@@ -155,39 +121,69 @@
   }
   ```
 
+#### **3. WebSocket 发送消息**
+
+- **URL**: `/app/sendMessage`
+- **方法**: `SEND`（WebSocket）
+- **描述**:  
+  客户端通过 WebSocket 向服务器发送消息，消息将被保存到数据库，并通过 WebSocket 推送到聊天室中的所有订阅者。
+
+- **请求体**：
+  发送的消息结构与 `POST /messages` API 的请求体相同。以下是 WebSocket 请求体的示例：
+  ```json
+  {
+    "chatRoomId": 1,
+    "userId": 10,
+    "content": "Hello, World!",
+    "messageType": "text"
+  }
+  ```
+
+- **响应**：
+  服务器会将消息推送到订阅了该聊天室的所有客户端。客户端接收到的消息与请求消息相同，附带 `createdAt`（消息发送时间）字段。
+  ```json
+  {
+    "chatRoomId": 1,
+    "userId": 10,
+    "content": "Hello, World!",
+    "messageType": "text",
+    "createdAt": "2024-12-01T14:35:23"
+  }
+  ```
+
+---
 
 ### **前端 WebSocket 使用示例**
 
-以下是前端如何通过 WebSocket 与服务器交互的示例。
+以下是前端如何通过 WebSocket 与服务器交互的示例：
 
 ```javascript
 // 建立 WebSocket 连接
-let socket = new SockJS('/ws/chat');  // 连接 WebSocket 服务
-let stompClient = Stomp.over(socket);
+let socket = new WebSocket('ws://127.0.0.1:8080/ws/chat');  // 连接 WebSocket 服务
 
 // 连接成功后的回调
-stompClient.connect({}, function (frame) {
-    console.log("WebSocket连接成功：", frame);
+socket.onopen = function(event) {
+    console.log("WebSocket连接成功：", event);
 
     // 订阅聊天室消息
-    stompClient.subscribe('/topic/chat-room/1', function (messageOutput) {
-        let message = JSON.parse(messageOutput.body);
+    socket.onmessage = function(event) {
+        let message = JSON.parse(event.data);
         console.log("收到消息：", message);
         // 处理新消息并显示在聊天界面
         displayMessage(message);
-    });
+    };
+};
 
-    // 发送消息到指定聊天室
-    function sendMessage(content) {
-        let message = {
-            chatRoomId: 1,
-            userId: 10,
-            content: content,
-            messageType: 'text'
-        };
-        stompClient.send("/app/chat-room/1", {}, JSON.stringify(message));
-    }
-});
+// 发送消息到指定聊天室
+function sendMessage(content) {
+    let message = {
+        chatRoomId: 1,
+        userId: 10,
+        content: content,
+        messageType: 'text'
+    };
+    socket.send(JSON.stringify(message));
+}
 
 // 显示消息
 function displayMessage(message) {
@@ -197,7 +193,6 @@ function displayMessage(message) {
 ```
 
 ---
-
 
 ### **总结**
 
@@ -214,9 +209,12 @@ function displayMessage(message) {
   所有的消息格式与通过 HTTP 发送的消息一致，包括 `chatRoomId`、`userId`、`content` 和 `messageType`。
 
 - **前端示例**:  
-  通过使用 `SockJS` 和 `Stomp.js` 库，前端可以轻松实现 WebSocket 连接、消息发送和接收功能。
+  使用原生 WebSocket API 直接与服务器通信，进行消息的发送和接收。
 
 ---
 
+### **修改说明**
+- 移除了与 `SockJS` 相关的配置和示例，直接使用原生 WebSocket。
+- 更新了 WebSocket 连接的实现和前端示例代码，采用标准的 WebSocket API。
 
-
+---
