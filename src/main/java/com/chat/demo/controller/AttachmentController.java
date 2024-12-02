@@ -23,7 +23,7 @@ public class AttachmentController {
                                                     @RequestParam("file") MultipartFile file) {
         try {
             // 上传附件到 MinIO，返回文件的 URL
-            AttachmentDto attachment = attachmentService.uploadAttachment(file, chatRoomId);
+          AttachmentDto attachment = attachmentService.uploadAttachment(file, chatRoomId);
 
             return Response.success(attachment);
         } catch (Exception e) {

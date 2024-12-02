@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Video Call</title>
+    <style>
+        #localVideo, #remoteVideo {
+            width: 45%;
+            margin: 10px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>WebRTC Video Call</h1>
+<video id="localVideo" autoplay muted></video>
+<video id="remoteVideo" autoplay></video>
+
+<script>
+    // WebSocket 连接
+    const socket = new WebSocket('ws://127.0.0.1:8080/ws/chat');  // 替换为实际的后端 WebSocket 地址
+    let localStream;
+    let peerConnection;
+    let chatRoomId = "123";  // 假设一个聊天室 ID，实际应用中可以动态生成
+
+    const configuration = {
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]  // Google 的公共 STUN 服务器
+    };
+
+    // 获取用户的媒体设备（摄像头和麦克风）
+    async function getUserMedia() {
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            const localVideo = document.getElementById('localVideo');
+            localVideo.srcObject = localStream;
+            createPeerConnection();
+        } catch (error) {
+            console.error('Error accessing media devices.', error);
+            alert('无法访问摄像头或麦克风');
+        }
+    }
+
+    // 创建并配置 RTCPeerConnection
+    function createPeerConnection() {
+        peerConnection = new RTCPeerConnection(configuration);
+
+        // 将本地流添加到 PeerConnection
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+        // 处理远端视频流
+        peerConnection.ontrack = (event) => {
+            const remoteVideo = document.getElementById('remoteVideo');
+            remoteVideo.srcObject = event.streams[0];
+        };
+
+        // 处理 ICE 候选
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                sendCandidate(event.candidate);
+            }
+        };
+    }
+
+    // 发送 Offer 信令
+    async function createOffer() {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        sendOffer(offer);
+    }
+
+    // 发送 Offer 信令消息到 WebSocket
+    function sendOffer(offer) {
+        const message = {
+            type: "offer",
+            sdp: offer.sdp,
+            chatRoomId: chatRoomId
+        };
+        socket.send(JSON.stringify(message));
+    }
+
+    // 发送 Answer 信令
+    function sendAnswer(answer) {
+        const message = {
+            type: "answer",
+            sdp: answer.sdp,
+            chatRoomId: chatRoomId
+        };
+        socket.send(JSON.stringify(message));
+    }
+
+    // 发送 ICE Candidate
+    function sendCandidate(candidate) {
+        const message = {
+            type: "candidate",
+            candidate: candidate,
+            chatRoomId: chatRoomId
+        };
+        socket.send(JSON.stringify(message));
+    }
+
+    // 处理来自 WebSocket 的信令消息
+    socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+
+        if (message.type === 'offer') {
+            handleOffer(message.sdp);
+        } else if (message.type === 'answer') {
+            handleAnswer(message.sdp);
+        } else if (message.type === 'candidate') {
+            handleCandidate(message.candidate);
+        }
+    };
+
+    // 处理 Offer 信令
+    async function handleOffer(offer) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        sendAnswer(answer);
+    }
+
+    // 处理 Answer 信令
+    async function handleAnswer(answer) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    }
+
+    // 处理 ICE Candidate 信令
+    function handleCandidate(candidate) {
+        peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+    }
+
+    // 启动获取本地视频并创建连接
+    getUserMedia();
+
+    // 在页面加载时创建 Offer
+    // 你可以通过点击按钮或某个事件触发此操作
+    setTimeout(createOffer, 2000);  // 模拟自动创建 Offer，实际应用中可以根据需要触发
+</script>
+</body>
+</html>

@@ -2,12 +2,10 @@ package com.chat.demo.websocket;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 @Configuration
@@ -15,22 +13,20 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
-    public void configureMessageBroker(org.springframework.messaging.simp.config.MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/queue");  // 订阅地址
-        config.setApplicationDestinationPrefixes("/app");  // 发送地址
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic", "/queue", "/video");  // 增加 /video 路径来处理 WebRTC 消息
+        config.setApplicationDestinationPrefixes("/app");  // 发送消息的路径
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/chat")
-                .setAllowedOrigins("http://127.0.0.1:8080","http://127.0.0.1:5500")  // 允许特定的源进行连接
-                .withSockJS();
+                .setAllowedOrigins("http://127.0.0.1:8080", "http://127.0.0.1:5500")
+                .withSockJS();  // 支持 SockJS，防止 WebSocket 连接不稳定
     }
-
 
     @Bean
     public ServerEndpointExporter serverEndpointExporter() {
-        return new ServerEndpointExporter();
+        return new ServerEndpointExporter();  // 用于支持 WebSocket 协议
     }
-
 }
