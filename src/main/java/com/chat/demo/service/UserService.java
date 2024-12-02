@@ -52,7 +52,8 @@ public class UserService {
     // 根据 ID 获取用户
     public Response<UserDto> getUserById(Long id) {
         Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isEmpty()) {
+        if (userOptional.isEmpty())
+        {
             return Response.error("用户不存在");
         }
         return Response.success(mapToDto(userOptional.get()));

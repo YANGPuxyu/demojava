@@ -44,11 +44,24 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.addAllowedOrigin("http://127.0.0.1:5173"); // 指定前端地址
+//        configuration.addAllowedOrigin("http://127.0.0.1:5500"); // 指定前端地址
+//        configuration.addAllowedOrigin("http://127.0.0.1:5501"); // 指定前端地址
+//        configuration.addAllowedMethod("*"); // 允许所有 HTTP 方法
+//        configuration.addAllowedHeader("*"); // 允许所有请求头
+//        configuration.setAllowCredentials(true); // 允许携带 Cookie
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://127.0.0.1:5173"); // 指定前端地址
-        configuration.addAllowedOrigin("http://127.0.0.1:5500"); // 指定前端地址
+        // 允许所有来源
+        configuration.addAllowedOriginPattern("*");  // 允许所有域名
         configuration.addAllowedMethod("*"); // 允许所有 HTTP 方法
         configuration.addAllowedHeader("*"); // 允许所有请求头
         configuration.setAllowCredentials(true); // 允许携带 Cookie
@@ -56,4 +69,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 }
