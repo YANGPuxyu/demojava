@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotNull;
 public class AttachmentDto {
     private Long id; // 附件 ID
 
-    @NotNull(message = "Message ID cannot be null")
-    private Long messageId; // 消息 ID
 
     @NotBlank(message = "File name cannot be empty")
     private String fileName; // 文件名
@@ -20,6 +18,9 @@ public class AttachmentDto {
 
     private String uploadedAt; // 上传时间（格式化返回）
 
+    @NotNull(message = " ID cannot be null")
+    private Long chatRoomId; // 聊天室 ID
+
     // Getters and setters
     public Long getId() {
         return id;
@@ -27,14 +28,6 @@ public class AttachmentDto {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getMessageId() {
-        return messageId;
-    }
-
-    public void setMessageId(Long messageId) {
-        this.messageId = messageId;
     }
 
     public String getFileName() {
@@ -67,5 +60,13 @@ public class AttachmentDto {
 
     public void setUploadedAt(String uploadedAt) {
         this.uploadedAt = uploadedAt;
+    }
+
+    public Long getChatRoomId() {
+        return chatRoomId;
+    }
+
+    public void setChatRoomId(Long chatRoomId) {
+        this.chatRoomId = chatRoomId;
     }
 }
