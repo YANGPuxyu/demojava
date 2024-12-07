@@ -4,6 +4,7 @@ import com.chat.demo.entity.DTO.ChatRoomMemberDto;
 import com.chat.demo.response.Response;
 import com.chat.demo.service.ChatRoomMemberService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,13 @@ public class ChatRoomMemberController {
     public Response<List<ChatRoomMemberDto>> getMembersByChatRoom(@PathVariable Long chatRoomId) {
         List<ChatRoomMemberDto> members = chatRoomMemberService.getMembersByChatRoom(chatRoomId);
         return Response.success(members);
+    }
+
+    @GetMapping("/my-chat-rooms")
+    public Response<List<Long>> getMyChatRooms(Authentication authentication) {
+        Long userId = (Long) authentication.getPrincipal();
+        List<Long> chatRoomIds = chatRoomMemberService.getChatRoomsByUser(userId);
+        return Response.success(chatRoomIds);
     }
 
     @DeleteMapping("/{id}")

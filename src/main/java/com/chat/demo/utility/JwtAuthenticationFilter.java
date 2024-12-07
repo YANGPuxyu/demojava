@@ -12,6 +12,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -31,11 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);  // 去掉 "Bearer " 前缀
             Claims claims = jwtUtil.validateToken(token);  // 验证 token
-            String username = claims.getSubject();  // 从 token 中提取用户名
+            Long userId = Long.valueOf(claims.getSubject());  // 从 token 中提取用户Id
+            String role = claims.get("role", String.class);  // 从 token 中提取角色
 
             // 创建认证对象，并设置到 SecurityContext 中
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(username, null, null);
+                    new UsernamePasswordAuthenticationToken(userId, null, List.of(() -> role));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
