@@ -1,11 +1,8 @@
 package com.chat.demo.entity;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.OneToMany;
-import java.util.List;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
-import jakarta.persistence.PrePersist;
-
 
 import java.time.LocalDateTime;
 
@@ -15,24 +12,17 @@ public class Friendship {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 主键
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user; // 用户
+    @Column(name = "user_1_id")
+    private Long user1Id;
 
-    @ManyToOne
-    @JoinColumn(name = "friend_id", nullable = false)
-    private User friend; // 好友
+    @Column(name = "user_2_id")
+    private Long user2Id;
 
     @CreatedDate
     @Column(name = "created_at")
-    private LocalDateTime createdAt; // 好友关系建立时间
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+    private LocalDateTime createdAt;
 
     // Getters and setters
     public Long getId() {
@@ -43,20 +33,20 @@ public class Friendship {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUser1Id() {
+        return user1Id;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser1Id(Long user1Id) {
+        this.user1Id = user1Id;
     }
 
-    public User getFriend() {
-        return friend;
+    public Long getUser2Id() {
+        return user2Id;
     }
 
-    public void setFriend(User friend) {
-        this.friend = friend;
+    public void setUser2Id(Long user2Id) {
+        this.user2Id = user2Id;
     }
 
     public LocalDateTime getCreatedAt() {

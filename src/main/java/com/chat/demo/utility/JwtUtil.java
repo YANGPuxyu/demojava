@@ -28,9 +28,9 @@ public class JwtUtil {
     }
 
     // 生成 JWT token
-    public String generateToken(String username, String role) {
+    public String generateToken(Long userId, String role) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(String.valueOf(userId))  // Use user ID as the subject
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 360000000)) // 设置过期时间为1小时

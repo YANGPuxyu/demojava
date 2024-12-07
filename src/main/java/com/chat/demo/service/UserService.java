@@ -33,7 +33,7 @@ public class UserService {
 
         // 用户验证通过，生成 Token
         User user = userOptional.get();
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+        String token = jwtUtil.generateToken(user.getId(), user.getRole());
 
         // 构建返回数据
         Map<String, Object> responseData = new HashMap<>();
@@ -67,7 +67,7 @@ public class UserService {
         }
 
         User user = mapToEntity(userDto);
-        user.setRole("用户"); // 默认角色
+        //  user.setRole("用户"); // 默认角色
         User savedUser = userRepository.save(user);
         return Response.success(mapToDto(savedUser));
     }
