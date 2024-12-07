@@ -1,6 +1,7 @@
 package com.chat.demo.service;
 
 import com.chat.demo.entity.Attachment;
+import com.chat.demo.entity.ChatRoom;
 import com.chat.demo.entity.DTO.AttachmentDto;
 import com.chat.demo.repository.AttachmentRepository;
 import io.minio.errors.MinioException;
@@ -49,7 +50,7 @@ public class AttachmentService {
 
             return convertToDto(savedAttachment);
         } catch (Exception e) {
-            throw new MinioException("Error uploading file to MinIO");
+            throw new MinioException("Error uploading file to MinIO"+e.getMessage());
         }
     }
 
@@ -62,17 +63,28 @@ public class AttachmentService {
         return false;
     }
 
-    // 将实体转换为 DTO
+// 将实体转换为 DTO
     private AttachmentDto convertToDto(Attachment attachment) {
         AttachmentDto attachmentDto = new AttachmentDto();
         BeanUtils.copyProperties(attachment, attachmentDto);
+        // 手动设置 chatRoomId
+        attachmentDto.setChatRoomId(attachment.getChatRoom().getId()); // 从 chatRoom 获取 ID 并设置到 DTO
+        // 格式化 uploadedAt 时间（如果需要）
+        attachmentDto.setUploadedAt(attachment.getUploadedAt().toString()); // 或者根据需要格式化为特定的字符串格式
+
         return attachmentDto;
     }
-
-    // 将 DTO 转换为实体
+// 将 DTO 转换为实体
     private Attachment convertToEntity(AttachmentDto attachmentDto) {
         Attachment attachment = new Attachment();
         BeanUtils.copyProperties(attachmentDto, attachment);
+
+        // 手动设置 chatRoomId
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setId(attachmentDto.getChatRoomId()); // 根据 DTO 中的 chatRoomId 设置 ChatRoom 对象
+        attachment.setChatRoom(chatRoom); // 将 ChatRoom 设置到 Attachment 实体类中
+
         return attachment;
     }
+
 }
