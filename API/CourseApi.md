@@ -1,225 +1,308 @@
 
-#### **1. 创建课程**
-**URL**: `/courses`  
-**方法**: `POST`  
-**描述**: 创建一个新的课程。
+---
 
-**请求参数**:
-- **Body**:
+### **1. 创建课程**
+
+- **请求路径**: `/courses`
+- **请求方法**: `POST`
+- **请求体** (JSON):
+
 ```json
 {
-  "name": "课程名称",
-  "description": "课程描述",
-  "chatRoom": {
-    "name": "聊天室名称"
-  }
+    "name": "Java基础课程",
+    "description": "学习Java基础知识",
+    "price": 199.99,
+    "credits": 3,
+    "teacherName": "张三",
+    "startDate": "2024-01-01T09:00:00",
+    "endDate": "2024-06-01T09:00:00",
+    "hasExam": true,
+    "examDate": "2024-06-01T09:00:00",
+    "location": "第一教室",
+    "teachingSessions": 36
 }
 ```
 
-**响应示例**:
-- 成功:
+- **响应成功** (HTTP 200):
+
 ```json
 {
-  "code": 200,
-  "message": "Success",
-  "data": {
-    "id": 1,
-    "name": "课程名称",
-    "description": "课程描述",
-    "chatRoom": {
-      "id": 10,
-      "name": "聊天室名称"
+    "code": 200,
+    "message": "Success",
+    "data": {
+        "id": 1,
+        "name": "Java基础课程",
+        "description": "学习Java基础知识",
+        "price": 199.99,
+        "credits": 3,
+        "teacherName": "张三",
+        "startDate": "2024-01-01T09:00:00",
+        "endDate": "2024-06-01T09:00:00",
+        "hasExam": true,
+        "examDate": "2024-06-01T09:00:00",
+        "location": "第一教室",
+        "teachingSessions": 36
     }
-  }
 }
 ```
-- 失败:
+
+- **响应失败** (HTTP 500):
+
 ```json
 {
-  "code": 500,
-  "message": "Failed to create course",
-  "data": null
+    "code": 500,
+    "message": "Failed to create course",
+    "data": null
 }
 ```
 
 ---
 
-#### **2. 获取所有课程**
-**URL**: `/courses`  
-**方法**: `GET`  
-**描述**: 获取所有课程的列表。
+### **2. 获取所有课程**
 
-**请求参数**: 无
+- **请求路径**: `/courses`
+- **请求方法**: `GET`
+- **响应成功** (HTTP 200):
 
-**响应示例**:
-- 成功:
 ```json
 {
-  "code": 200,
-  "message": "Success",
-  "data": [
-    {
-      "id": 1,
-      "name": "课程名称1",
-      "description": "课程描述1",
-      "chatRoom": {
-        "id": 10,
-        "name": "聊天室名称1"
-      }
-    },
-    {
-      "id": 2,
-      "name": "课程名称2",
-      "description": "课程描述2",
-      "chatRoom": {
-        "id": 11,
-        "name": "聊天室名称2"
-      }
+    "code": 200,
+    "message": "Success",
+    "data": [
+        {
+            "id": 1,
+            "name": "Java基础课程",
+            "description": "学习Java基础知识",
+            "price": 199.99,
+            "credits": 3,
+            "teacherName": "张三",
+            "startDate": "2024-01-01T09:00:00",
+            "endDate": "2024-06-01T09:00:00",
+            "hasExam": true,
+            "examDate": "2024-06-01T09:00:00",
+            "location": "第一教室",
+            "teachingSessions": 36
+        }
+    ]
+}
+```
+
+---
+
+### **3. 根据课程 ID 获取课程**
+
+- **请求路径**: `/courses/{id}`
+- **请求方法**: `GET`
+- **请求参数**:
+  - `id`: 课程的 ID
+- **响应成功** (HTTP 200):
+
+```json
+{
+    "code": 200,
+    "message": "Success",
+    "data": {
+        "id": 1,
+        "name": "Java基础课程",
+        "description": "学习Java基础知识",
+        "price": 199.99,
+        "credits": 3,
+        "teacherName": "张三",
+        "startDate": "2024-01-01T09:00:00",
+        "endDate": "2024-06-01T09:00:00",
+        "hasExam": true,
+        "examDate": "2024-06-01T09:00:00",
+        "location": "第一教室",
+        "teachingSessions": 36
     }
-  ]
+}
+```
+
+- **响应失败** (HTTP 404):
+
+```json
+{
+    "code": 500,
+    "message": "Course not found",
+    "data": null
 }
 ```
 
 ---
 
-#### **3. 根据 ID 获取课程**
-**URL**: `/courses/{id}`  
-**方法**: `GET`  
-**描述**: 根据课程 ID 获取课程详情。
+### **4. 删除课程**
 
-**请求参数**:
-- **Path**:
-    - `id` (Long): 课程的唯一标识符。
+- **请求路径**: `/courses/{id}`
+- **请求方法**: `DELETE`
+- **请求参数**:
+  - `id`: 课程的 ID
+- **响应成功** (HTTP 200):
 
-**响应示例**:
-- 成功:
 ```json
 {
-  "code": 200,
-  "message": "Success",
-  "data": {
-    "id": 1,
-    "name": "课程名称",
-    "description": "课程描述",
-    "chatRoom": {
-      "id": 10,
-      "name": "聊天室名称"
+    "code": 200,
+    "message": "Course deleted successfully",
+    "data": null
+}
+```
+
+- **响应失败** (HTTP 404):
+
+```json
+{
+    "code": 500,
+    "message": "Course not found or could not be deleted",
+    "data": null
+}
+```
+
+---
+
+### **5. 更新课程**
+
+- **请求路径**: `/courses/{id}`
+- **请求方法**: `PUT`
+- **请求参数**:
+  - `id`: 课程的 ID
+- **请求体** (JSON):
+
+```json
+{
+    "name": "Java高级课程",
+    "description": "学习Java进阶知识",
+    "price": 299.99,
+    "credits": 4,
+    "teacherName": "李四",
+    "startDate": "2024-02-01T09:00:00",
+    "endDate": "2024-07-01T09:00:00",
+    "hasExam": true,
+    "examDate": "2024-07-01T09:00:00",
+    "location": "第二教室",
+    "teachingSessions": 40
+}
+```
+
+- **响应成功** (HTTP 200):
+
+```json
+{
+    "code": 200,
+    "message": "Success",
+    "data": {
+        "id": 1,
+        "name": "Java高级课程",
+        "description": "学习Java进阶知识",
+        "price": 299.99,
+        "credits": 4,
+        "teacherName": "李四",
+        "startDate": "2024-02-01T09:00:00",
+        "endDate": "2024-07-01T09:00:00",
+        "hasExam": true,
+        "examDate": "2024-07-01T09:00:00",
+        "location": "第二教室",
+        "teachingSessions": 40
     }
-  }
 }
 ```
-- 失败:
+
+- **响应失败** (HTTP 404):
+
 ```json
 {
-  "code": 500,
-  "message": "Course not found",
-  "data": null
+    "code": 500,
+    "message": "Failed to update course",
+    "data": null
 }
 ```
 
 ---
 
-#### **4. 删除课程**
-**URL**: `/courses/{id}`  
-**方法**: `DELETE`  
-**描述**: 根据课程 ID 删除课程及其关联的聊天室。
+### **6. 获取某个聊天室的所有课程**
 
-**请求参数**:
-- **Path**:
-    - `id` (Long): 课程的唯一标识符。
+- **请求路径**: `/courses/chatroom/{chatRoomId}`
+- **请求方法**: `GET`
+- **请求参数**:
+  - `chatRoomId`: 聊天室 ID
+- **响应成功** (HTTP 200):
 
-**响应示例**:
-- 成功:
 ```json
 {
-  "code": 200,
-  "message": "Success",
-  "data": null
-}
-```
-- 失败:
-```json
-{
-  "code": 500,
-  "message": "Course not found or could not be deleted",
-  "data": null
-}
-```
-
----
-
-#### **5. 更新课程**
-**URL**: `/courses/{id}`  
-**方法**: `PUT`  
-**描述**: 根据课程 ID 更新课程信息。
-
-**请求参数**:
-- **Path**:
-    - `id` (Long): 课程的唯一标识符。
-- **Body**:
-```json
-{
-  "name": "新的课程名称",
-  "description": "新的课程描述",
-  "chatRoom": {
-    "name": "新的聊天室名称"
-  }
+    "code": 200,
+    "message": "Success",
+    "data": [
+        {
+            "id": 1,
+            "name": "Java基础课程",
+            "description": "学习Java基础知识",
+            "price": 199.99,
+            "credits": 3,
+            "teacherName": "张三",
+            "startDate": "2024-01-01T09:00:00",
+            "endDate": "2024-06-01T09:00:00",
+            "hasExam": true,
+            "examDate": "2024-06-01T09:00:00",
+            "location": "第一教室",
+            "teachingSessions": 36
+        }
+    ]
 }
 ```
 
-**响应示例**:
-- 成功:
+- **响应失败** (HTTP 404):
+
 ```json
 {
-  "code": 200,
-  "message": "Success",
-  "data": {
-    "id": 1,
-    "name": "新的课程名称",
-    "description": "新的课程描述",
-    "chatRoom": {
-      "id": 10,
-      "name": "新的聊天室名称"
-    }
-  }
-}
-```
-- 失败:
-```json
-{
-  "code": 500,
-  "message": "Failed to update course",
-  "data": null
+    "code": 500,
+    "message": "No courses found for the given chat room",
+    "data": null
 }
 ```
 
 ---
 
-### 状态码说明
-- **200**: 操作成功。
-- **500**: 操作失败（可能是资源未找到或内部错误）。
+### **7. 获取某个教师的所有课程**
+
+- **请求路径**: `/courses/teacher/{teacherName}`
+- **请求方法**: `GET`
+- **请求参数**:
+  - `teacherName`: 教师姓名
+- **响应成功** (HTTP 200):
+
+```json
+{
+    "code": 200,
+    "message": "Success",
+    "data": [
+        {
+            "id": 1,
+            "name": "Java基础课程",
+            "description": "学习Java基础知识",
+            "price": 199.99,
+            "credits": 3,
+            "teacherName": "张三",
+            "startDate": "2024-01-01T09:00:00",
+            "endDate": "2024-06-01T09:00:00",
+            "hasExam": true,
+            "examDate": "2024-06-01T09:00:00",
+            "location": "第一教室",
+            "teachingSessions": 36
+        }
+    ]
+}
+```
+
+- **响应失败** (HTTP 404):
+
+```json
+{
+    "code": 500,
+    "message": "No courses found for the given teacher",
+    "data": null
+}
+```
 
 ---
 
-### 数据模型
+### **总结**
 
-#### **CourseDto**
-```json
-{
-  "id": 1,
-  "name": "课程名称",
-  "description": "课程描述",
-  "chatRoom": {
-    "id": 10,
-    "name": "聊天室名称"
-  }
-}
-```
-
-#### **ChatRoomDto**
-```json
-{
-  "id": 10,
-  "name": "聊天室名称"
-}
-```
+如上所示，所有返回的报文已经使用了统一的 `Response` 封装，并且根据你提供的 `Response` 类格式，所有成功的响应都会返回 `200` 的 `code`，并且包含 `data` 字段

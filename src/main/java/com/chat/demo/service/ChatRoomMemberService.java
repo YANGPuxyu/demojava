@@ -2,12 +2,17 @@ package com.chat.demo.service;
 import com.chat.demo.entity.ChatRoomMember;
 import com.chat.demo.entity.DTO.ChatRoomMemberDto;
 import com.chat.demo.repository.ChatRoomMemberRepository;
+import com.chat.demo.response.Response;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
+
 @Service
 public class ChatRoomMemberService {
 
@@ -36,6 +41,14 @@ public class ChatRoomMemberService {
     // 从聊天室移除成员
     public void removeMemberFromChatRoom(Long id) {
         chatRoomMemberRepository.deleteById(id);
+    }
+
+    // 获取用户所加入的所有聊天室
+    public List<Long> getChatRoomsByUser(Long userId) {
+        return chatRoomMemberRepository.findByUserId(userId)
+                .stream()
+                .map(ChatRoomMember::getChatRoomId)
+                .collect(Collectors.toList());
     }
 
     // 将实体转换为 DTO

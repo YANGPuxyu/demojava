@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Video </title>
+    <style>
+        #localVideo, #remoteVideo {
+            width: 45%;
+            margin: 10px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<h1>java Video </h1>
+<video id="localVideo" autoplay muted></video>
+<video id="remoteVideo" autoplay></video>
+
+<!-- 引入 SockJS 和 STOMP.js -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+<script>
+    let socket = new SockJS('http://127.0.0.1:8080/ws/chat');  // WebSocket 地址
+    let stompClient = Stomp.over(socket);
+    let localStream;
+    let peerConnection;
+    let chatRoomId = "2";  // 示例聊天室 ID，实际使用时可以动态获取
+
+    const configuration = {
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]  // STUN 服务器
+    };
+
+    // 获取媒体设备（摄像头和麦克风）
+    async function getUserMedia() {
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById('localVideo').srcObject = localStream;
+            createPeerConnection();
+        } catch (error) {
+            console.error('Error accessing media devices.', error);
+            alert('无法访问摄像头或麦克风');
+        }
+    }
+
+    // 创建 RTCPeerConnection
+    function createPeerConnection() {
+        peerConnection = new RTCPeerConnection(configuration);
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+        peerConnection.ontrack = (event) => {
+            document.getElementById('remoteVideo').srcObject = event.streams[0];
+        };
+
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                sendCandidate(event.candidate);
+            }
+        };
+    }
+
+    // 发送 Offer 信令
+    async function createOffer() {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        sendSignal('offer', offer.sdp);
+    }
+
+    // 发送 Answer 信令
+    function sendAnswer(answer) {
+        sendSignal('answer', answer.sdp);
+    }
+
+    // 发送 ICE Candidate
+    function sendCandidate(candidate) {
+        sendSignal('candidate', candidate);
+    }
+
+    // 发送信令消息
+    function sendSignal(type, data) {
+        const message = {
+            type: type,
+            sdp: data,
+            chatRoomId: chatRoomId
+        };
+        stompClient.send("/app/send" + type.charAt(0).toUpperCase() + type.slice(1), {}, JSON.stringify(message));
+    }
+    // 处理 WebSocket 消息
+    function handleSignal(message) {
+        const signal = JSON.parse(message.body);
+
+        if (signal.type === 'offer') {
+            handleOffer(signal.sdp);
+        } else if (signal.type === 'answer') {
+            handleAnswer(signal.sdp);
+        } else if (signal.type === 'candidate') {
+            handleCandidate(signal.candidate);
+        }
+    }
+    // 处理 Offer
+    async function handleOffer(offer) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: offer }));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        sendAnswer(answer);
+    }
+    // 处理 Answer
+    async function handleAnswer(answer) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: answer }));
+    }
+    // 处理 ICE Candidate
+    function handleCandidate(candidate) {
+        peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+    }
+    // 启动获取本地视频并创建连接
+    getUserMedia();
+    // WebSocket 连接
+    stompClient.connect({}, function(frame) {
+        stompClient.subscribe('/topic/video/' + chatRoomId, handleSignal);
+
+        // 触发 Offer 创建（模拟自动创建 Offer）
+        setTimeout(createOffer, 10000);  // 或通过用户点击触发
+    });
+</script>
+</body>
+</html>

@@ -13,9 +13,6 @@ public class Attachment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 主键
 
-    @Column(name = "message_id", nullable = false)
-    private Long messageId; // 消息 ID
-
     @Column(name = "file_name", nullable = false)
     private String fileName; // 文件名
 
@@ -29,6 +26,11 @@ public class Attachment {
     @Column(name = "uploaded_at")
     private LocalDateTime uploadedAt; // 上传时间
 
+    // Many-to-One 关系，多个附件属于同一个聊天室
+    @ManyToOne
+    @JoinColumn(name = "chat_room_id", nullable = false) // 外键字段
+    private ChatRoom chatRoom;
+
     // Getters and setters
     public Long getId() {
         return id;
@@ -38,13 +40,6 @@ public class Attachment {
         this.id = id;
     }
 
-    public Long getMessageId() {
-        return messageId;
-    }
-
-    public void setMessageId(Long messageId) {
-        this.messageId = messageId;
-    }
 
     public String getFileName() {
         return fileName;
@@ -76,5 +71,13 @@ public class Attachment {
 
     public void setUploadedAt(LocalDateTime uploadedAt) {
         this.uploadedAt = uploadedAt;
+    }
+
+    public ChatRoom getChatRoom() {
+        return chatRoom;
+    }
+
+    public void setChatRoom(ChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
     }
 }
