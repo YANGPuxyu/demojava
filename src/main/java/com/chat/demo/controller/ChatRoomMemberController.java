@@ -28,11 +28,10 @@ public class ChatRoomMemberController {
         return Response.success(members);
     }
 
-    @GetMapping("/my-chat-rooms")
-    public Response<List<Long>> getMyChatRooms(Authentication authentication) {
-        Long userId = (Long) authentication.getPrincipal();
-        List<Long> chatRoomIds = chatRoomMemberService.getChatRoomsByUser(userId);
-        return Response.success(chatRoomIds);
+    @GetMapping("/user/{userId}/chat-rooms")
+    public Response<List<ChatRoomMemberDto>> getChatRoomsByUserId(@PathVariable Long userId) {
+        List<ChatRoomMemberDto> chatRooms = chatRoomMemberService.getChatRoomsByUserId(userId);
+        return Response.success(chatRooms);
     }
 
     @DeleteMapping("/{id}")

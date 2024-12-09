@@ -44,11 +44,8 @@ public class ChatRoomMemberService {
     }
 
     // 获取用户所加入的所有聊天室
-    public List<Long> getChatRoomsByUser(Long userId) {
-        return chatRoomMemberRepository.findByUserId(userId)
-                .stream()
-                .map(ChatRoomMember::getChatRoomId)
-                .collect(Collectors.toList());
+    public List<ChatRoomMemberDto> getChatRoomsByUserId(Long userId) {
+        return chatRoomMemberRepository.findChatRoomsByUserId(userId);
     }
 
     // 将实体转换为 DTO
