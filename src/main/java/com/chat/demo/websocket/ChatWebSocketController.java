@@ -19,12 +19,23 @@ public class ChatWebSocketController {
     // 接收 WebSocket 消息并保存，然后推送给其他客户端
     @MessageMapping("/sendMessage")  // 监听 "/app/sendMessage" 的消息
     public void handleMessage(MessageDto messageDto) {
+        // 调试：输出接收到的消息内容
+        System.out.println("接收到前端消息: " + messageDto);
 
         // 保存消息到数据库
-        MessageDto savedMessage = messageService.sendMessage(messageDto);
+        try {
+            MessageDto savedMessage = messageService.sendMessage(messageDto);
+            System.out.println("消息已保存到数据库: " + savedMessage);
 
-        // 将保存的消息推送到所有订阅了该聊天室的客户端
-        messagingTemplate.convertAndSend("/topic/chat-room/" + savedMessage.getChatRoomId(), savedMessage);
+            // 将保存的消息推送到所有订阅了该聊天室的客户端
+            String destination = "/topic/chat-room/" + savedMessage.getChatRoomId();
+            messagingTemplate.convertAndSend(destination, savedMessage);
+            System.out.println("消息已推送到: " + destination);
 
+        } catch (Exception e) {
+            // 捕获异常并打印错误日志
+            System.err.println("处理消息时发生错误: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

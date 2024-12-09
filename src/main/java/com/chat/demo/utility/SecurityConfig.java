@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // 禁用 CSRF，因为 WebSocket 连接不需要 CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 跨域配置
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/login", "/users/register","/messages/**","/ws/**").permitAll() // 登录、注册接口公开
+                        .requestMatchers("/users/login", "/users/register","/messages/**","/ws/**","/actuator/**").permitAll() // 登录、注册接口公开
                         .requestMatchers("/ws/chat").permitAll() // 允许 WebSocket 连接
                         .anyRequest().authenticated() // 其余接口需要认证
                 )
@@ -44,19 +44,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    //    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.addAllowedOrigin("http://127.0.0.1:5173"); // 指定前端地址
-//        configuration.addAllowedOrigin("http://127.0.0.1:5500"); // 指定前端地址
-//        configuration.addAllowedOrigin("http://127.0.0.1:5501"); // 指定前端地址
-//        configuration.addAllowedMethod("*"); // 允许所有 HTTP 方法
-//        configuration.addAllowedHeader("*"); // 允许所有请求头
-//        configuration.setAllowCredentials(true); // 允许携带 Cookie
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

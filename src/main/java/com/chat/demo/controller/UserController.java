@@ -20,6 +20,7 @@ public class UserController {
     // 登录接口，返回用户信息
     @PostMapping("/login")
     public Response<Map<String, Object>> login(@RequestBody UserDto userDto) {
+        System.out.println("接收到前端消息: " );
         return userService.login(userDto);
     }
 

@@ -20,11 +20,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/chat")
-                .setAllowedOrigins("*")  // 允许所有来源的跨域请求
-                .withSockJS();  // 支持 SockJS，防止 WebSocket 连接不稳定
+                .setAllowedOrigins("*");  // 允许所有来源的跨域请求
+//                 .withSockJS();  // 支持 SockJS，防止 WebSocket 连接不稳定
     }
-
-
     @Bean
     public ServerEndpointExporter serverEndpointExporter() {
         return new ServerEndpointExporter();  // 用于支持 WebSocket 协议
