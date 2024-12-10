@@ -3,8 +3,10 @@ import com.chat.demo.entity.ChatRoom;
 import com.chat.demo.entity.ChatRoomMember;
 import com.chat.demo.entity.DTO.ChatRoomDto;
 import com.chat.demo.entity.DTO.ChatRoomMemberDto;
+import com.chat.demo.entity.User;
 import com.chat.demo.repository.ChatRoomMemberRepository;
 import com.chat.demo.repository.ChatRoomRepository;
+import com.chat.demo.repository.UserRepository;
 import com.chat.demo.response.Response;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 
@@ -27,6 +30,9 @@ public class ChatRoomMemberService {
 
     @Autowired
     private ChatRoomService chatRoomService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     // 获取聊天室的所有成员
     public List<ChatRoomMemberDto> getMembersByChatRoom(Long chatRoomId) {
@@ -68,6 +74,39 @@ public class ChatRoomMemberService {
                 .collect(Collectors.toList());
     }
 
+    public List<ChatRoomDto> getPublicChatRoomDtosByUserId(Long userId) {
+        List<Long> chatRoomIds = chatRoomMemberRepository.findChatRoomIdsByUserId(userId);
+        List<ChatRoom> chatRooms = chatRoomRepository.findByIdInAndIsPrivate(chatRoomIds, false);
+        return chatRooms.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    public List<ChatRoomDto> getPrivateChatRoomDtosByUserId(Long userId) {
+        List<Long> chatRoomIds = chatRoomMemberRepository.findChatRoomIdsByUserId(userId);
+        List<ChatRoom> chatRooms = chatRoomRepository.findByIdInAndIsPrivate(chatRoomIds, true);
+        for (ChatRoom chatRoom :  chatRooms) {
+            String otherUserName = getOtherUserName(chatRoom.getId(), userId);
+            chatRoom.setName(otherUserName);
+        }
+        return chatRooms.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    private String getOtherUserName(Long chatRoomId, Long userId) {
+        List<Long> userIds = chatRoomMemberRepository.findUserIdsByChatRoomId(chatRoomId);
+        userIds.remove(userId);
+        if (userIds.isEmpty()) {
+            return "Unknown";
+        } else {
+            Long otherUserId = userIds.get(0);
+            Optional<User> otherUserOptional = userRepository.findById(otherUserId);
+            if (otherUserOptional.isPresent()) {
+                User otherUser = otherUserOptional.get();
+                return "Private Chat with " + otherUser.getUsername();
+            } else {
+                return "Unknown";
+            }
+        }
+    }
+
     // 将实体转换为 DTO
     private ChatRoomMemberDto convertToDto(ChatRoomMember member) {
         ChatRoomMemberDto memberDto = new ChatRoomMemberDto();
@@ -80,6 +119,12 @@ public class ChatRoomMemberService {
         ChatRoomMember member = new ChatRoomMember();
         BeanUtils.copyProperties(memberDto, member);
         return member;
+    }
+
+    private ChatRoomDto convertToDto(ChatRoom chatRoom) {
+        ChatRoomDto chatRoomDto = new ChatRoomDto();
+        BeanUtils.copyProperties(chatRoom, chatRoomDto);
+        return chatRoomDto;
     }
 }
 

@@ -28,6 +28,9 @@ public class ChatRoom {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt; // 更新时间
 
+    @Column(name = "is_private")
+    private boolean isPrivate; // 新增字段：是否为私聊
+
     // Getters and setters
     public Long getId() {
         return id;
@@ -67,5 +70,13 @@ public class ChatRoom {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 }

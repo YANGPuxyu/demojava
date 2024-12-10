@@ -62,6 +62,28 @@ public class ChatRoomMemberController {
     }
 
     /**
+        * 根据用户 ID 获取公共聊天室 DTO
+        * @param userId 用户 ID
+        * @return 公共聊天室 DTO 列表
+     * */
+    @GetMapping("/user/{userId}/public-chat-rooms")
+    public Response<List<ChatRoomDto>> getPublicChatRoomsByUserId(@PathVariable Long userId) {
+        List<ChatRoomDto> chatRooms = chatRoomMemberService.getPublicChatRoomDtosByUserId(userId);
+        return Response.success(chatRooms);
+    }
+
+    /**
+        * 根据用户 ID 获取私有聊天室 DTO
+        * @param userId 用户 ID
+        * @return 私有聊天室 DTO 列表
+     * */
+    @GetMapping("/user/{userId}/private-chat-rooms")
+    public Response<List<ChatRoomDto>> getPrivateChatRoomsByUserId(@PathVariable Long userId) {
+        List<ChatRoomDto> chatRooms = chatRoomMemberService.getPrivateChatRoomDtosByUserId(userId);
+        return Response.success(chatRooms);
+    }
+
+    /**
         * 从聊天室移除成员
         * @param id 成员 ID
         * @return 操作结果

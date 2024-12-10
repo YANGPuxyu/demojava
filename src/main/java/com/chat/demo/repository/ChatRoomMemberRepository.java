@@ -22,5 +22,9 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     // 自定义查询，根据用户ID查找聊天室ID
     @Query("SELECT c.chatRoomId FROM ChatRoomMember c WHERE c.userId = :userId")
     List<Long> findChatRoomIdsByUserId(@Param("userId") Long userId);
+
+    // 自定义查询，根据聊天室ID查找用户ID
+    @Query("SELECT c.userId FROM ChatRoomMember c WHERE c.chatRoomId = :chatRoomId")
+    List<Long> findUserIdsByChatRoomId(Long chatRoomId);
 }
 

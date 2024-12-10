@@ -16,18 +16,21 @@ public class ChatRoomController {
     private ChatRoomService chatRoomService;
 
     /**
-     * 创建聊天室
+     * 创建公共聊天室
      * @param chatRoom 聊天室
      * @return 创建的聊天室
      */
     @PostMapping
-    public Response<ChatRoomDto> createChatRoom(@RequestBody ChatRoomDto chatRoom) {
-        ChatRoomDto createdChatRoom = chatRoomService.createChatRoom(chatRoom);
-        if (createdChatRoom == null) {
-            return Response.error("Failed to create chat room");
-        }
-        return Response.success(createdChatRoom);
+public Response<ChatRoomDto> createChatRoom(@RequestBody ChatRoomDto chatRoom) {
+    ChatRoomDto createdChatRoom = chatRoomService.createPublicChatRoom(
+        chatRoom.getName(),
+        chatRoom.getCourseId()
+    );
+    if (createdChatRoom == null) {
+        return Response.error("Failed to create chat room");
     }
+    return Response.success(createdChatRoom);
+}
 
     /**
      * 获取所有聊天室

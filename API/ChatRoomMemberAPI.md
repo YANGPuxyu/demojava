@@ -100,13 +100,14 @@
 ```
 ---
 
-### **3. 根据用户 ID 获取聊天室 DTO 列表**
-- **URL**: `/chat-room-members/user/{userId}/chat-rooms`
+### **3. 根据用户 ID 获取公共聊天室 DTO**
+
+- **URL**: `/chat-room-members/user/{userId}/public-chat-rooms`
 - **请求方法**: `GET`
-- **描述**: 根据用户 ID 获取该用户加入的所有聊天室的 DTO 列表。
+- **描述**: 根据用户 ID 获取公共聊天室 DTO 列表。
 - **路径参数**:
   - `userId` (Long): 用户的唯一标识。
-  - **响应**:
+- **响应**:
 
 **成功**:
 ```json
@@ -115,18 +116,14 @@
   "message": "Success",
   "data": [
     {
-      "id": 100,
-      "name": "Java Chat Room",
-      "description": "A chat room for Java developers",
-      "createdAt": "2024-11-24T15:00:00",
-      "createdBy": 200
+      "id": 1,
+      "name": "Our awesome public chat room",
+      "courseId": 101
     },
     {
-      "id": 101,
-      "name": "Python Chat Room",
-      "description": "A chat room for Python developers",
-      "createdAt": "2024-11-24T16:00:00",
-      "createdBy": 201
+      "id": 2,
+      "name": "Confederation of Public Chat Rooms",
+      "courseId": 102
     }
   ]
 }
@@ -136,14 +133,53 @@
 ```json
 {
   "code": 500,
-  "message": "Failed to fetch chat rooms for the user",
+  "message": "Failed to fetch public chat rooms for user with id: {userId}",
   "data": null
 }
 ```
 
+### **4. 根据用户 ID 获取私有聊天室 DTO**
+
+- **URL**: `/chat-room-members/user/{userId}/private-chat-rooms`
+- **请求方法**: `GET`
+- **描述**: 根据用户 ID 获取私有聊天室 DTO 列表。
+- **路径参数**:
+  - `userId` (Long): 用户的唯一标识。
+- **响应**:
+
+**成功**:
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": [
+    {
+      "id": 1,
+      "name": "Private Chat with [AnotherUserName]",
+      "courseId": 101
+    },
+    {
+      "id": 2,
+      "name": "Private Chat with [AnotherUserName]",
+      "courseId": 102
+    }
+  ]
+}
+```
+
+**失败**:
+```json
+{
+  "code": 500,
+  "message": "Failed to fetch private chat rooms for user with id: {userId}",
+  "data": null
+}
+```
+
+
 ---
 
-### **4. 从聊天室移除成员**
+### **5. 从聊天室移除成员**
 
 - **URL**: `/chat-room-members/{id}`
 - **请求方法**: `DELETE`
