@@ -1,7 +1,9 @@
 package com.chat.demo.service;
 
 import com.chat.demo.entity.ChatRoom;
+import com.chat.demo.entity.ChatRoomMember;
 import com.chat.demo.entity.DTO.ChatRoomDto;
+import com.chat.demo.repository.ChatRoomMemberRepository;
 import com.chat.demo.repository.ChatRoomRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ public class ChatRoomService {
     @Autowired
     private ChatRoomRepository chatRoomRepository;
 
+    @Autowired
+    private ChatRoomMemberRepository chatRoomMemberRepository;
+
     // 获取所有聊天室
     public List<ChatRoomDto> getAllChatRooms() {
         return chatRoomRepository.findAll()
@@ -32,14 +37,39 @@ public class ChatRoomService {
         return chatRoomOptional.map(this::convertToDto).orElse(null);
     }
 
-    // 创建聊天室
-    public ChatRoomDto createChatRoom(ChatRoomDto chatRoomDto) {
-        ChatRoom chatRoom = convertToEntity(chatRoomDto);
+    public ChatRoomDto createPrivateChatRoom(Long userId1, Long userId2) {
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setName("Private Chat" + userId1 + " & " + userId2);
         chatRoom.setCreatedAt(LocalDateTime.now());
-        chatRoom.setUpdatedAt(LocalDateTime.now());
+        chatRoom.setPrivate(true); // 设置为私聊
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+
+        // 添加两个成员到聊天室
+        addMemberToChatRoom(savedChatRoom.getId(), userId1);
+        addMemberToChatRoom(savedChatRoom.getId(), userId2);
+
         return convertToDto(savedChatRoom);
     }
+
+    private void addMemberToChatRoom(Long chatRoomId, Long userId) {
+        ChatRoomMember member = new ChatRoomMember();
+        member.setChatRoomId(chatRoomId);
+        member.setUserId(userId);
+        member.setJoinedAt(LocalDateTime.now());
+        chatRoomMemberRepository.save(member);
+    }
+
+
+public ChatRoomDto createPublicChatRoom(String name, Long courseId) {
+    ChatRoom chatRoom = new ChatRoom();
+    chatRoom.setName(name);
+    chatRoom.setCourseId(courseId);
+    chatRoom.setCreatedAt(LocalDateTime.now());
+    chatRoom.setUpdatedAt(LocalDateTime.now());
+    chatRoom.setPrivate(false);
+    ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+    return convertToDto(savedChatRoom);
+}
 
     // 删除聊天室
     public boolean deleteChatRoom(Long id) {
