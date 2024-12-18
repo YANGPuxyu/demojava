@@ -22,6 +22,9 @@ public class FriendRequestService {
     @Autowired
     private FriendshipRepository friendshipRepository;
 
+    @Autowired
+    private ChatRoomService chatRoomService;
+
     public FriendRequest createFriendRequest(Long senderUserId, Long receiverUserId, String announcement) {
         FriendRequest friendRequest = new FriendRequest();
         friendRequest.setSenderUserId(senderUserId);
@@ -36,6 +39,8 @@ public class FriendRequestService {
         FriendRequest friendRequest = friendRequestRepository.findById(requestId).orElseThrow();
         friendRequest.setStatus(FriendRequest.Status.APPROVED);
         friendRequestRepository.save(friendRequest);
+
+        chatRoomService.createPrivateChatRoom(friendRequest.getSenderUserId(), friendRequest.getReceiverUserId());
 
         User user = new User();
         user.setId(friendRequest.getSenderUserId());
