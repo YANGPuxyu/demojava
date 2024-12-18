@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,7 +54,20 @@ public class AttachmentService {
             throw new MinioException("Error uploading file to MinIO"+e.getMessage());
         }
     }
+    // 下载附件
+    public InputStream downloadAttachment(String attachmentUrl) throws MinioException {
+        // 根据文件 URL 查询附件
+        Attachment attachment = attachmentRepository.findByFileUrl(attachmentUrl)
+                .orElseThrow(() -> new RuntimeException("Attachment not found for URL"));
 
+        // 获取 URL 中的文件对象信息
+        String[] urlParts = attachmentUrl.split("/");
+        String bucketName = urlParts[urlParts.length - 2];
+        String objectName = urlParts[urlParts.length - 1];
+
+        // 使用 FileUploadService 下载文件
+        return fileUploadService.downloadFile(bucketName, objectName);
+    }
     // 删除附件
     public boolean deleteAttachment(Long id) {
         if (attachmentRepository.existsById(id)) {

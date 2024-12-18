@@ -56,4 +56,7 @@ public class Friendship {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+
+
 }

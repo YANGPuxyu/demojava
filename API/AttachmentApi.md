@@ -12,57 +12,131 @@
 
 ---
 
-## 接口
+以下是基于你提供的代码生成的 API 文档，涵盖了上传和下载附件的功能。
 
-### 1. **上传附件**
-- **URL**: `/attachments`
-- **方法**: `POST`
-- **描述**: 上传附件到指定聊天室，并将文件存储到 MinIO。
-- **请求参数**:
-  - `chatRoomId` (必需): 要将附件关联的聊天室 ID。
-  - `file` (必需): 要上传的文件。
+### API 文档
 
-#### 请求示例：
+#### 1. 上传附件
+
+**请求 URL：**
 ```
+POST /attachments
+```
+
+**请求参数：**
+- **chatRoomId** (必填): `Long` 类型，聊天室 ID，用于关联上传的附件。
+- **file** (必填): `MultipartFile` 类型，待上传的文件。
+
+**请求示例：**
 ```bash
-curl -X POST "http://localhost:8080/attachments" \
-     -F "chatRoomId=123" \
-     -F "file=@path/to/your/file.jpg"
-```
+POST /attachments
+Content-Type: multipart/form-data
 
-#### 请求体：
-- Form-data:
-  - `chatRoomId` (Long): 聊天室的 ID（必需）。
-  - `file` (MultipartFile): 要上传的文件（必需）。
-
-#### 响应：
-- **状态码**: `200`
-- **消息**: `"成功"`
-- **数据**: 附件的详细信息，包括文件名、文件类型、文件 URL 和关联的聊天室 ID。
-
-#### 响应示例：
-```json
 {
-  "code": 200,
-  "message": "成功",
-  "data": {
-    "id": 1,
-    "fileName": "file.jpg",
-    "fileType": "image/jpeg",
-    "fileUrl": "https://minio-url.com/attachments/file.jpg",
-    "uploadedAt": "2024-12-01T12:34:56",
-    "chatRoomId": 123
-  }
+  "chatRoomId": 123,
+  "file": <file>
 }
 ```
 
-- **错误响应**:
-  - **状态码**: `500`
-  - **消息**: `"上传附件失败: {错误信息}"`
+**响应：**
+- **成功响应：**
+  - 状态码：`200 OK`
+  - 返回内容：
+    ```json
+    {
+      "code": 200,
+      "message": "Success",
+      "data": {
+        "id": 1,
+        "fileName": "example.jpg",
+        "fileType": "image/jpeg",
+        "fileUrl": "https://your-minio-url.com/attachments/example.jpg",
+        "chatRoomId": 123,
+        "uploadedAt": "2024-12-18T12:00:00"
+      }
+    }
+    ```
+  - **字段说明**：
+    - `id`: 附件 ID
+    - `fileName`: 上传的文件名
+    - `fileType`: 文件类型
+    - `fileUrl`: 文件在存储服务中的 URL
+    - `chatRoomId`: 聊天室 ID
+    - `uploadedAt`: 文件上传时间
 
----
+- **失败响应：**
+  - 状态码：`500 Internal Server Error`
+  - 返回内容：
+    ```json
+    {
+      "code": 500,
+      "message": "Failed to upload attachment: Error uploading file to MinIO"
+    }
+    ```
 
-### 2. **根据聊天室 ID 获取附件**
+### 2. 下载附件
+
+**请求 URL：**
+```
+GET /attachments/download
+```
+
+**请求参数：**
+- **fileUrl** (必填): `String` 类型，附件文件的 URL，用于指定需要下载的附件。可以是完整的 URL 地址。
+
+**请求示例：**
+```bash
+GET /attachments/download?fileUrl=http://minio-server/attachments/example.jpg
+```
+
+**响应：**
+- **成功响应：**
+  - 状态码：`200 OK`
+  - 响应头：
+    - `Content-Disposition`: `attachment; filename="example.jpg"` （根据文件名动态生成）
+    - `Content-Type`: `application/octet-stream`
+  - 响应体：返回附件文件的流内容。浏览器会自动处理文件下载。
+
+- **失败响应：**
+  - 状态码：`400 Bad Request`
+  - 返回内容：
+    ```json
+    {
+      "code": 1,
+      "message": "Attachment URL is missing"
+    }
+    ```
+
+  - 状态码：`404 Not Found`
+  - 返回内容：
+    ```json
+    {
+      "code": 2,
+      "message": "Attachment not found for the given URL"
+    }
+    ```
+
+  - 状态码：`500 Internal Server Error`
+  - 返回内容：
+    ```json
+    {
+      "code": 3,
+      "message": "Error downloading file from MinIO"
+    }
+    ```
+
+### 错误码说明
+- **1**: 缺少 `fileUrl` 参数，表示请求未提供文件的 URL。
+- **2**: 无法找到对应的附件，表示 URL 对应的附件不存在。
+- **3**: 通用错误，表示文件下载失败，可能是 MinIO 存储服务的问题。
+- **0**: 成功，表示操作完成并返回正确的数据。
+
+### 说明
+- 该 API 通过附件的 URL 来查询并下载附件，用户需要提供附件的完整 URL 地址，系统会通过该 URL 查询附件信息并从 MinIO 中下载文件。
+- 如果提供的 URL 对应的附件不存在，系统将返回 `404` 错误；如果请求缺少必要参数，则返回 `400` 错误；如果下载过程中出现问题，则返回 `500` 错误。
+
+
+### 2. **根据聊天室 ID 获取附件信息(不下载)**
 - **URL**: `/attachments/{roomId}`
 - **方法**: `GET`
 - **描述**: 获取指定聊天室的所有附件。

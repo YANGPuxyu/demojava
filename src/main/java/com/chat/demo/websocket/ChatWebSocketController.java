@@ -19,7 +19,6 @@ public class ChatWebSocketController {
     // 接收 WebSocket 消息并保存，然后推送给其他客户端
     @MessageMapping("/sendMessage")  // 监听 "/app/sendMessage" 的消息
     public void handleMessage(MessageDto messageDto) {
-        // 调试：输出接收到的消息内容
         System.out.println("接收到前端消息: " + messageDto);
 
         // 保存消息到数据库
