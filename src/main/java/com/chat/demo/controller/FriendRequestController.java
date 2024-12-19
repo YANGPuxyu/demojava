@@ -25,7 +25,6 @@ public class FriendRequestController {
         );
         return Response.success(friendRequest);
     }
-
     @PostMapping("/{requestId}/approve")
     public Response<Void> approveFriendRequest(@PathVariable Long requestId) {
         friendRequestService.approveFriendRequest(requestId);
