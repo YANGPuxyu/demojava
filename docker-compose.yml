@@ -1,0 +1,44 @@
+version: '3.9'
+services:
+  app:
+    build:
+      context: . # 当前目录下的 Dockerfile
+    container_name: springboot-demo
+    ports:
+      - "8080:8080" # 映射主机的 8080 到容器的 8080
+    depends_on:
+      - mysql
+      - minio
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/spring_boot_sjh?serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456
+      MINIO_URL: http://minio:9000
+      MINIO_ACCESS_KEY: myaccesskey
+      MINIO_SECRET_KEY: mysecretkey123
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: spring_boot_sjh
+    ports:
+      - "3306:3306" # 映射 MySQL 默认端口
+    command: --default-authentication-plugin=mysql_native_password # 避免密码插件问题
+    volumes:
+      - ./ini.sql:/docker-entrypoint-initdb.d/ini.sql  # 将 ini.sql 文件拷贝到容器内
+      # 不使用容器卷，数据库数据存储在容器内部，而不会持久化
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: myaccesskey
+      MINIO_ROOT_PASSWORD: mysecretkey123
+    ports:
+      - "9000:9000" # MinIO 数据服务
+      - "9001:9001" # MinIO 控制台服务
+    command: server /data --console-address ":9001"

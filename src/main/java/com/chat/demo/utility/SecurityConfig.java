@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // 禁用 CSRF，因为 WebSocket 连接不需要 CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 跨域配置
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/login", "/users/register","/messages/**","/ws/**","/actuator/**").permitAll() // 登录、注册接口公开
+                        .requestMatchers("/users/login", "/users/register","/messages/**","/ws/**","/actuator/**","/api/**","/attachments/**").permitAll() // 登录、注册接口公开
                         .requestMatchers("/ws/chat").permitAll() // 允许 WebSocket 连接
                         .anyRequest().authenticated() // 其余接口需要认证
                 )
