@@ -54,20 +54,32 @@ public class AttachmentService {
             throw new MinioException("Error uploading file to MinIO"+e.getMessage());
         }
     }
-    // 下载附件
     public InputStream downloadAttachment(String attachmentUrl) throws MinioException {
-        // 根据文件 URL 查询附件
-        Attachment attachment = attachmentRepository.findByFileUrl(attachmentUrl)
-                .orElseThrow(() -> new RuntimeException("Attachment not found for URL"));
+        try {
+            System.out.println("[DEBUG] Received fileUrl: " + attachmentUrl);
 
-        // 获取 URL 中的文件对象信息
-        String[] urlParts = attachmentUrl.split("/");
-        String bucketName = urlParts[urlParts.length - 2];
-        String objectName = urlParts[urlParts.length - 1];
+            // 根据文件 URL 查询附件
+            Attachment attachment = attachmentRepository.findByFileUrl(attachmentUrl)
+                    .orElseThrow(() -> new RuntimeException("Attachment not found for URL: " + attachmentUrl));
 
-        // 使用 FileUploadService 下载文件
-        return fileUploadService.downloadFile(bucketName, objectName);
+            System.out.println("[DEBUG] Found attachment: " + attachment);
+
+            // 获取 URL 中的文件对象信息
+            String[] urlParts = attachmentUrl.split("/");
+            String bucketName = urlParts[urlParts.length - 2];
+            String objectName = urlParts[urlParts.length - 1];
+
+            System.out.println("[DEBUG] Extracted bucketName: " + bucketName + ", objectName: " + objectName);
+
+            // 使用 FileUploadService 下载文件
+            return fileUploadService.downloadFile(bucketName, objectName);
+        } catch (Exception e) {
+            System.err.println("[ERROR] Error in downloadAttachment: " + e.getMessage());
+            e.printStackTrace();
+            throw new MinioException("Failed to download file: " + attachmentUrl);
+        }
     }
+
     // 删除附件
     public boolean deleteAttachment(Long id) {
         if (attachmentRepository.existsById(id)) {

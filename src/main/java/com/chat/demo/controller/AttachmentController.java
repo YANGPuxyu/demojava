@@ -70,6 +70,8 @@ public class AttachmentController {
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource> downloadAttachment(@RequestParam("fileUrl") String attachmentUrl) {
         try {
+            System.out.println("[DEBUG] Starting downloadAttachment with fileUrl: " + attachmentUrl);
+
             InputStream fileStream = attachmentService.downloadAttachment(attachmentUrl);
 
             // 设置响应头
@@ -80,7 +82,10 @@ public class AttachmentController {
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(new InputStreamResource(fileStream));
         } catch (Exception e) {
+            System.err.println("[ERROR] Failed to download file: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(500).body(null);
         }
     }
+
 }
