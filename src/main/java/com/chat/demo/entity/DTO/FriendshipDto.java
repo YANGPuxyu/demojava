@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 
 public class FriendshipDto {
     private Long id;
-    private Long userId;
-    private Long friendId;
+    private Long user1Id;
+    private Long user2Id;
     private LocalDateTime createdAt;
 
     // Getters and setters
@@ -18,19 +18,19 @@ public class FriendshipDto {
     }
 
     public Long getUser1Id() {
-        return userId;
+        return user1Id;
     }
 
-    public void setUser1Id(Long userId) {
-        this.userId = userId;
+    public void setUser1Id(Long user1Id) {
+        this.user1Id = user1Id;
     }
 
     public Long getUser2Id() {
-        return friendId;
+        return user2Id;
     }
 
-    public void setUser2Id(Long friendId) {
-        this.friendId = friendId;
+    public void setUser2Id(Long user2Id) {
+        this.user2Id = user2Id;
     }
 
     public LocalDateTime getCreatedAt() {

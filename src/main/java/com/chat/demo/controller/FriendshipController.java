@@ -35,13 +35,9 @@ public class FriendshipController {
         return Response.success(friends);
     }
 
-    @DeleteMapping("/users/{userId}/friends/{friendId}")
+    @DeleteMapping("/user/{userId}/friend/{friendId}")
     public Response<Void> removeFriend(@PathVariable Long userId, @PathVariable Long friendId) {
-        User user = new User();
-        user.setId(userId);
-        User friend = new User();
-        friend.setId(friendId);
-        friendshipService.removeFriend(user, friend);
+        friendshipService.removeFriend(userId, friendId);
         return Response.success(null);
     }
 }
