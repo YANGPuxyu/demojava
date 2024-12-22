@@ -30,9 +30,14 @@ public class FriendshipService {
         return friendships.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    public void removeFriend(User user, User friend) {
-        friendshipRepository.deleteByUser1IdAndUser2Id(user.getId(), friend.getId());
-        friendshipRepository.deleteByUser1IdAndUser2Id(friend.getId(), user.getId());
+    public void removeFriend(Long userId, Long friendId) {
+        Friendship friendship = friendshipRepository.findByUser1IdAndUser2Id(userId, friendId);
+        if (friendship == null) {
+            friendship = friendshipRepository.findByUser1IdAndUser2Id(friendId, userId);
+        }
+        if (friendship != null) {
+            friendshipRepository.delete(friendship);
+        }
     }
 
     private FriendshipDto toDTO(Friendship friendship) {

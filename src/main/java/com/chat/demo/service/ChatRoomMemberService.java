@@ -100,7 +100,7 @@ public class ChatRoomMemberService {
             Optional<User> otherUserOptional = userRepository.findById(otherUserId);
             if (otherUserOptional.isPresent()) {
                 User otherUser = otherUserOptional.get();
-                return "Private Chat with " + otherUser.getUsername();
+                return "好友：" + otherUser.getUsername();
             } else {
                 return "Unknown";
             }

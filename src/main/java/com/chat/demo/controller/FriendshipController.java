@@ -17,15 +17,15 @@ public class FriendshipController {
     @Autowired
     private FriendshipService friendshipService;
 
-    @PostMapping("/friends")
-    public Response<Friendship> addFriend(@RequestBody FriendshipDto friendshipDTO) {
-        User user = new User();
-        user.setId(friendshipDTO.getUser1Id());
-        User friend = new User();
-        friend.setId(friendshipDTO.getUser2Id());
-        Friendship newFriendship = friendshipService.addFriend(user, friend);
-        return Response.success(newFriendship);
-    }
+//    @PostMapping("/friends")
+//    public Response<Friendship> addFriend(@RequestBody FriendshipDto friendshipDTO) {
+//        User user = new User();
+//        user.setId(friendshipDTO.getUser1Id());
+//        User friend = new User();
+//        friend.setId(friendshipDTO.getUser2Id());
+//        Friendship newFriendship = friendshipService.addFriend(user, friend);
+//        return Response.success(newFriendship);
+//    }
 
     @GetMapping("/users/{userId}")
     public Response<List<FriendshipDto>> getFriends(@PathVariable Long userId) {
@@ -35,13 +35,9 @@ public class FriendshipController {
         return Response.success(friends);
     }
 
-    @DeleteMapping("/users/{userId}/friends/{friendId}")
+    @DeleteMapping("/user/{userId}/friend/{friendId}")
     public Response<Void> removeFriend(@PathVariable Long userId, @PathVariable Long friendId) {
-        User user = new User();
-        user.setId(userId);
-        User friend = new User();
-        friend.setId(friendId);
-        friendshipService.removeFriend(user, friend);
+        friendshipService.removeFriend(userId, friendId);
         return Response.success(null);
     }
 }
