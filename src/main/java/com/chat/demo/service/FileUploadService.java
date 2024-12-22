@@ -41,12 +41,21 @@ public class FileUploadService {
     // 下载文件
     public InputStream downloadFile(String bucketName, String objectName) throws MinioException {
         try {
-            return minioClient.getObject(GetObjectArgs.builder()
+            System.out.println("[DEBUG] Attempting to download file from bucket: " + bucketName + ", object: " + objectName);
+
+            InputStream inputStream = minioClient.getObject(GetObjectArgs.builder()
                     .bucket(bucketName)
                     .object(objectName)
                     .build());
+
+            System.out.println("[DEBUG] Successfully downloaded file: " + objectName + " from bucket: " + bucketName);
+            return inputStream;
         } catch (Exception e) {
-            throw new MinioException("Error downloading file from MinIO");
+            System.err.println("[ERROR] Error downloading file from MinIO. Bucket: " + bucketName + ", Object: " + objectName);
+            System.err.println("[ERROR] " + e.getMessage());
+            e.printStackTrace();
+            throw new MinioException("Error downloading file from MinIO: " + e.getMessage());
         }
     }
+
 }

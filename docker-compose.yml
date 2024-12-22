@@ -5,7 +5,8 @@ services:
       context: . # 当前目录下的 Dockerfile
     container_name: springboot-demo
     ports:
-      - "8080:8080" # 映射主机的 8080 到容器的 8080
+      - "8080:8080"  # 映射 HTTP 端口
+      - "8443:8443"  # 映射 HTTPS 端口
     depends_on:
       - mysql
       - minio
